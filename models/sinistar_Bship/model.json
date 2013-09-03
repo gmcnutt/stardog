@@ -1,0 +1,6 @@
+{
+    "name":"sinistar_Bship",
+    "description":"A medium-sized bluish bullet-shaped ship.",
+    "animations": { "default": { "frames": ["0.png"]}}
+}
+        

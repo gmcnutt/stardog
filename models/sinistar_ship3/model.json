@@ -1,0 +1,10 @@
+{
+    "name":"sinistar_ship3",
+    "bullet":"sinistar_bullet_4_3",
+    "animations": { "default": { "loop" : true,
+                                 "fps" : 3,
+                                 "frames": ["0.png", 
+                                            "1.png",
+                                            "2.png"]}}
+}
+        

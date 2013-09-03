@@ -1,0 +1,6 @@
+{
+    "name":"sinistar_bullet_4_3",
+    "description":"A smallish red bullet with a single image.",
+    "animations": { "default": { "frames": ["0.png"]}}
+}
+        

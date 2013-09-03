@@ -1,0 +1,6 @@
+{
+    "name":"sinistar_bullet_12_3",
+    "description":"A large greenish bullet with a single image.",
+    "animations": { "default": { "frames": ["0.png"]}}
+}
+        

@@ -1,0 +1,55 @@
+254,268c254
+<     def _rotate(self):
+<         """ Rotate the ship to face the current mouse position. """
+<         mousepos = pygame.mouse.get_pos()
+<         dx = self.rect.centerx - mousepos[0]
+<         dy = self.rect.centery - mousepos[1]
+<         # Note: dy != 0 since we divide by it; the > N is to prevent erratic
+<         # wobbling when the mouse is near the center.
+<         if abs(dx) > 2 and abs(dy) > 2:
+<             tangent = float(dx) / float(dy)
+<             angle = math.degrees(math.atan(tangent))
+<             if (dy < 0):
+<                 angle = 180.0+angle
+<             self.angle = angle
+< 
+<     def _get_acceleration(self, err, vel):
+---
+>     def _get_acceleration(self, err, vel, maxval):
+279c265
+<         ets = abs(vel)/self.max_accel
+---
+>         ets = abs(vel)/maxval
+282c268
+<                 accel = max(-self.max_accel, -abs(vel))
+---
+>                 accel = max(-maxval, -abs(vel))
+284c270
+<                 accel = min(self.max_accel, abs(vel))
+---
+>                 accel = min(maxval, abs(vel))
+287c273
+<                 accel = self.max_accel
+---
+>                 accel = maxval
+289c275
+<                 accel = -self.max_accel
+---
+>                 accel = -maxval
+293a280,289
+>     def _rotate(self):
+>         """ Rotate the ship to face the current mouse position. """
+>         mousepos = pygame.mouse.get_pos()
+>         dx = self.rect.centerx - mousepos[0]
+>         dy = self.rect.centery - mousepos[1]
+>         mouse_angle = vector.to_angle(dx, dy)
+>         angle_delta = mouse_angle - self.angle
+>         accel = self._get_acceleration(
+>         self.angle = angle
+> 
+298,299c294,295
+<         accx = self._get_acceleration(errv[0], self.velocity[0])
+<         accy = self._get_acceleration(errv[1], self.velocity[1])
+---
+>         accx = self._get_acceleration(errv[0], self.velocity[0], self.max_accel)
+>         accy = self._get_acceleration(errv[1], self.velocity[1], self.max_accel)

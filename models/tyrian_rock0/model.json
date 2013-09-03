@@ -1,0 +1,6 @@
+{
+    "name":"tyrian_rock0",
+    "description":"Medium-sized asteroid.",
+    "animations": { "default": { "frames": ["0.png"]}}
+}
+        
