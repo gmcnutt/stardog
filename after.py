@@ -130,8 +130,8 @@ class ObjectCounter(ui.Label):
 def run(screen):
     level = Level(screen=screen,
                   fps=FPS,
-                  #bgd=TextureBackground("sand.png"),
-                  bgd=FillBackground((0, 0, 0)),
+                  bgd=TextureBackground("sand.png"),
+                  #bgd=FillBackground((0, 0, 0)),
                   show_boxes=False)
 
     hist = {}
@@ -192,7 +192,7 @@ if __name__ == '__main__':
     args = object()
     pygame.init()
     # screen=pygame.display.set_mode(SIZE),
-    # screen=pygame.display.set_mode((0, 0), pygame.FULLSCREEN),
+    #screen=pygame.display.set_mode((0, 0), pygame.FULLSCREEN),
     screen = pygame.display.set_mode(SIZE)
     pygame.key.set_repeat(1, 25)
     large_font = font.AfterFont(ROOTDIR + 'large_font.json', IMAGEDIR)

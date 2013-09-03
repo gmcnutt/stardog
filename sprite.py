@@ -68,9 +68,8 @@ class ModelObject(BaseSprite):
     def __init__(self, velocity=None, angular_velocity=0):
         super(ModelObject, self).__init__()
         if velocity and not isinstance(velocity, list):
-            # tuples can't be modified in place
-            raise TypeError('velocity must be a list, not {}'.\
-                                format(type(velocity)))
+            raise TypeError('velocity must be a list, not {}'.
+                            format(type(velocity)))
         self.animation_view = self.__model__['default'].get_view()
         self._set_image(self.animation_view.frame)
         self.velocity = velocity or [0, 0]
@@ -79,7 +78,8 @@ class ModelObject(BaseSprite):
 
     def _set_image(self, image, original=True, remask=True):
         """ Set the current sprite image and rect and rebuild the collision
-        mask. Unless rotated remember this as the original prior to rotation."""
+        mask. Unless rotated remember this as the original prior to
+        rotation. """
         self.image = image
         if remask:
             self.mask = pygame.mask.from_surface(self.image)
@@ -94,7 +94,7 @@ class ModelObject(BaseSprite):
         """ Prepare to blit the image. """
         if self.angle:
             self._rotate_image()
-        
+
     def _rotate_image(self):
         """ Rotate the current image and update the rect and collision
         mask. Recenters the rotated image in the old location."""
@@ -115,7 +115,7 @@ class ModelObject(BaseSprite):
         direction = vector.from_angle(self.angle)
         vect = vector.scalar_multiply(direction, 20)
         endpos = vector.add(self.rect.center, vect)
-        return pygame.draw.line(self.level.screen, (255, 255, 0), 
+        return pygame.draw.line(self.level.screen, (255, 255, 0),
                                 self.rect.center,
                                 endpos)
 
@@ -123,7 +123,7 @@ class ModelObject(BaseSprite):
         """ Draw a line representing the velocity. """
         vect = vector.scalar_multiply(self.velocity, 10)
         endpos = vector.add(self.rect.center, vect)
-        return pygame.draw.line(self.level.screen, (0, 255, 255), 
+        return pygame.draw.line(self.level.screen, (0, 255, 255),
                                 self.rect.center,
                                 endpos)
 
@@ -132,7 +132,7 @@ class TickShot(ModelObject, CollidesWithPlayer):
 
     def __init__(self, **kwargs):
         super(TickShot, self).__init__(**kwargs)
-        self.ttl = 3 * 60 # FIXME: assumes 60 fps
+        self.ttl = 3 * 60  # FIXME: assumes 60 fps
 
     def update(self):
         super(TickShot, self).update()
@@ -161,11 +161,12 @@ class TickShip(ModelObject, EnemyShip, CollidesWithPlayer,
         if self.ticks_to_fire <= 0:
             direction = vector.from_angle(self.angle + 180)
             velocity = vector.scalar_multiply(direction, 3)
-            location = vector.add(self.maprect.center,
-                                  vector.scalar_multiply(direction, 
-                                                         self.maprect.width/2))
+            location = vector.add(
+                self.maprect.center,
+                vector.scalar_multiply(direction,
+                                       self.maprect.width / 2))
             #self.level.add(EnemyShot(velocity), location)
-            self.level.add(TickShot(velocity=list(velocity)), 
+            self.level.add(TickShot(velocity=list(velocity)),
                            location)
             self.ticks_to_fire = self.shot_period
 
@@ -215,7 +216,7 @@ class PlayerShot(ModelObject):
     def move(self, offset):
         self.moves += 1
         toff = vector.scalar_multiply(self.velocity, self.moves)
-        self.rect = self.original_rect.move(vector.add(toff, 
+        self.rect = self.original_rect.move(vector.add(toff,
                                                        self.scroll_offset))
         self.maprect = self.original_maprect.move(toff)
         self.ttl -= 1
@@ -245,7 +246,7 @@ class PlayerShip(ModelObject):
             velocity = vector.normalize(velocity)
             velocity = vector.scalar_multiply(velocity, 10)
             velocity = vector.add(velocity, vector.intvector(self.velocity))
-            self.level.add(PlayerShot(velocity=list(velocity)), 
+            self.level.add(PlayerShot(velocity=list(velocity)),
                            self.maprect.center)
             self.fire_wait_tick = 10
         else:
@@ -262,7 +263,7 @@ class PlayerShip(ModelObject):
             tangent = float(dx) / float(dy)
             angle = math.degrees(math.atan(tangent))
             if (dy < 0):
-                angle = 180.0+angle
+                angle = 180.0 + angle
             self.angle = angle
 
     def _get_acceleration(self, err, vel):
@@ -275,8 +276,8 @@ class PlayerShip(ModelObject):
                 return 1
             else:
                 return -1
-        eta = err/vel
-        ets = abs(vel)/self.max_accel
+        eta = err / vel
+        ets = abs(vel) / self.max_accel
         if (ets * self.accel_damp) > eta:
             if vel > 0:
                 accel = max(-self.max_accel, -abs(vel))
