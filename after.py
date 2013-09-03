@@ -15,13 +15,14 @@ import sprite
 import vector
 import ui
 
-SIZE = WIDTH, HEIGHT = 480*2, 480*2
+SIZE = WIDTH, HEIGHT = 480 * 2, 480 * 2
 FPS = 60
-MAX_SHOTS=20
-SCROLL=50
+MAX_SHOTS = 20
+SCROLL = 50
 ROOTDIR = os.path.dirname(__file__)
-IMAGEDIR= ROOTDIR + "art/png/"
+IMAGEDIR = ROOTDIR + "art/png/"
 MODELDIR = ROOTDIR + 'models/'
+
 
 def align_horz(rect, align):
     lm = rect.left % align
@@ -29,19 +30,22 @@ def align_horz(rect, align):
     rect.left -= lm
     rect.width += (lm + rm)
 
+
 def align_vert(rect, align):
     lm = rect.top % align
     rm = align - (rect.bottom % align)
     rect.top -= lm
     rect.height += (lm + rm)
 
+
 class Background(object):
 
     def __init__(self, *args, **kwargs):
         pass
-        
+
     def blit(self, surf, rect):
         pass
+
 
 class FillBackground(Background):
 
@@ -65,34 +69,37 @@ class TextureBackground(Background):
         align_horz(dest2, self.rect.width)
         align_vert(dest2, self.rect.height)
         area = self.rect.copy().move(dest2.topleft)
-        for row in range(dest2.height/area.height):
-            for col in range(dest2.width/area.width):
+        for row in range(dest2.height / area.height):
+            for col in range(dest2.width / area.width):
                 surf.blit(self.image, area)
                 area.left += area.width
             area.top += area.height
             area.left = dest2.left
+
 
 def add_ticks(level, num):
     for i in range(num):
         vel = vector.subtract(vector.randint(7, 7), (3, 3))
         position = level.get_offscreen_position((22, 22))
         level.add(sprite.TickShip(velocity=list(vel),
-                                  angular_velocity=random.random()*5),
+                                  angular_velocity=random.random() * 5),
                   position)
+
 
 def add_asteroids(level, num):
     for i in range(num):
         vel = vector.subtract(vector.randint(7, 7), (3, 3))
         position = level.get_offscreen_position((50, 50))
         level.add(sprite.BigAsteroid(velocity=list(vel),
-                                     angular_velocity=random.random()*5),
+                                     angular_velocity=random.random() * 5),
                   position)
 
+
 class FpsCounter(ui.Label):
-    
+
     def __init__(self, pos, *args, **kwargs):
         super(FpsCounter, self).__init__(*args, **kwargs)
-        self.clock =  pygame.time.Clock()
+        self.clock = pygame.time.Clock()
         self.rect = pygame.Rect((pos), (300, 20))
         self.fps = 0
 
@@ -104,8 +111,9 @@ class FpsCounter(ui.Label):
         self.paint()
         pygame.display.update(self.rect)
 
+
 class ObjectCounter(ui.Label):
-    
+
     def __init__(self, pos, group, *args, **kwargs):
         super(ObjectCounter, self).__init__(*args, **kwargs)
         self.rect = pygame.Rect((pos), (300, 20))
@@ -117,12 +125,12 @@ class ObjectCounter(ui.Label):
         #self.layout(self.maxrect)
         self.paint()
         pygame.display.update(self.rect)
-        
+
 
 def run(screen):
     level = Level(screen=screen,
                   fps=FPS,
-                  #bgd=TextureBackground("sand.png"), 
+                  #bgd=TextureBackground("sand.png"),
                   bgd=FillBackground((0, 0, 0)),
                   show_boxes=False)
 
@@ -135,13 +143,13 @@ def run(screen):
     add_asteroids(level, 1000)
 
     large_font = font.AfterFont(ROOTDIR + 'large_font.json', IMAGEDIR)
-    fps_counter = FpsCounter((0, screen.get_rect().height - 20), 
-                                large_font, 'fps: ', screen)
-    obj_counter = ObjectCounter((screen.get_rect().width - 300, 
+    fps_counter = FpsCounter((0, screen.get_rect().height - 20),
+                             large_font, 'fps: ', screen)
+    obj_counter = ObjectCounter((screen.get_rect().width - 300,
                                  screen.get_rect().height - 20),
                                 level.all,
                                 large_font, '', screen)
-    
+
     level.start()
     loops = 0
     while level:
@@ -157,13 +165,13 @@ def run(screen):
                     level.update()
                     obj_counter.tick()
                 elif event.key == pygame.K_UP:
-                    level.scroll((0, -1*SCROLL))
+                    level.scroll((0, -1 * SCROLL))
                 elif event.key == pygame.K_DOWN:
-                    level.scroll((0, 1*SCROLL))
+                    level.scroll((0, 1 * SCROLL))
                 elif event.key == pygame.K_LEFT:
-                    level.scroll((-1*SCROLL, 0))
+                    level.scroll((-1 * SCROLL, 0))
                 elif event.key == pygame.K_RIGHT:
-                    level.scroll((1*SCROLL, 0))
+                    level.scroll((1 * SCROLL, 0))
                 else:
                     #print('key:{}'.format(event))
                     pass
@@ -174,18 +182,18 @@ def run(screen):
             hist[obj_counter.count] = round(fps_counter.fps)
 
         fps_counter.tick()
-        
 
     for k in sorted(hist.keys()):
         print(k, hist[k])
 
+
 if __name__ == '__main__':
-    
-    args=object()
+
+    args = object()
     pygame.init()
-    # screen=pygame.display.set_mode(SIZE), 
-    # screen=pygame.display.set_mode((0, 0), pygame.FULLSCREEN), 
-    screen=pygame.display.set_mode(SIZE)
+    # screen=pygame.display.set_mode(SIZE),
+    # screen=pygame.display.set_mode((0, 0), pygame.FULLSCREEN),
+    screen = pygame.display.set_mode(SIZE)
     pygame.key.set_repeat(1, 25)
     large_font = font.AfterFont(ROOTDIR + 'large_font.json', IMAGEDIR)
 
@@ -197,10 +205,9 @@ if __name__ == '__main__':
                  (sprite.TickShip, 'sinistar_ship3'),
                  (sprite.TickShot, 'sinistar_bullet_4_3'),
                  (sprite.Explosion, 'sinistar_Explode3')
-        ]
+                 ]
     for pair in model_map:
         pair[0].__model__ = model.load(MODELDIR + pair[1], FPS)
-
 
     gui = ui.UI(screen, large_font)
     #gui.prompt("Get Ready!")
