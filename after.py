@@ -1,6 +1,5 @@
-# $Revision: 1.31 $
 #
-# Copyright (c) Gordon McNutt, 2011
+# Copyright (c) Gordon McNutt, 2013
 #
 
 import sys
@@ -139,8 +138,8 @@ def run(screen):
     level.add(PlayerShip(), level.rect.center)
     level.view(level.player)
 
-    add_ticks(level, 0)
-    add_asteroids(level, 1000)
+    #add_ticks(level, 10)
+    #add_asteroids(level, 100)
 
     large_font = font.AfterFont(ROOTDIR + 'large_font.json', IMAGEDIR)
     fps_counter = FpsCounter((0, screen.get_rect().height - 20),
@@ -196,6 +195,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(SIZE)
     pygame.key.set_repeat(1, 25)
     large_font = font.AfterFont(ROOTDIR + 'large_font.json', IMAGEDIR)
+    pygame.mouse.set_cursor(*pygame.cursors.diamond)
 
     # Load all the models
     model_map = [(sprite.PlayerShip, 'sinistar_Bship'),
