@@ -145,13 +145,14 @@ class Level(object):
         """ Called every frame. Erases the dirty rects from the last update and
         makes some more! This handles scrolling, updating all the sprites,
         repainting them, and checking for collisions."""
-        # erase
+        # Erase the rects drawn last time we were in update by blitting the
+        # background over them.
         for drect in self.drawn_rects:
             self.bgd.blit(self.screen, drect)
         erased_rects = self.drawn_rects
-        # Auto-scrolling.
+        # Handle auto-scrolling. If the player moves out of the scrolling rect
+        # then scroll in that direction.
         if self.player.rect.top < self.scrollrect.top:
-            #self.scroll((0, -self.scrollrect.height))
             self.scroll((0, (self.player.rect.top - self.scrollrect.top)))
         elif self.player.rect.bottom > self.scrollrect.bottom:
             self.scroll((0, (self.player.rect.bottom - self.scrollrect.bottom)))
@@ -159,27 +160,29 @@ class Level(object):
             self.scroll(((self.player.rect.left - self.scrollrect.left), 0))
         elif self.player.rect.right > self.scrollrect.right:
             self.scroll(((self.player.rect.right - self.scrollrect.right), 0))
-        # Cull out-of-bound sprites
+        # Cull out-of-bound sprites.
         self.cull()
         # Update (move) all sprites.
         self.all.update()
-        # paint grid & sprites
+        # Reset the drawn rects to empty before we start painting sprites.
         self.drawn_rects = []
+        # Paint the grid.
         self.drawn_rects += self.paint_grid()
-        # gather sprites into the hot group and render it
+        # Gather sprites into the hot group and render it.
         self.update_hot_group()
         self.drawn_rects += self.hot_group.draw(self.screen)
-        # show bounding boxes
+        # Show bounding boxes if called for.
         if self.show_boxes:
             for sprite in self.all:
                 pygame.draw.rect(self.screen, white, sprite.rect, 1)
             pygame.draw.rect(self.screen, white, self.scrollrect, 1)
-        # draw player velocity
+        # Draw player velocity vector line.
         self.drawn_rects.append(self.player.draw_velocity())
 ####        # draw angles
 ####        for sprite in self.bases:
 ####            if hasattr(sprite, 'draw_angle'):
 ####                self.drawn_rects.append(sprite.draw_angle())
+        # Paint the minimap.
         self.drawn_rects.append(self.minimap.paint())
         dirty_rects = erased_rects + self.drawn_rects
         pygame.display.update(dirty_rects)
