@@ -1,6 +1,5 @@
-# $Revision: 1.39 $
 #
-# Copyright (c) Gordon McNutt, 2011
+# Copyright (c) Gordon McNutt, 2013
 #
 
 import animation
@@ -236,6 +235,7 @@ class PlayerShip(ModelObject):
         self._layer = PLAYER_LAYER
         self.max_shots = 20
         self.fire_wait_tick = 10
+        self.count = 0
 
     def _fire(self):
         """ Fire if the mouse button is held down. """
@@ -267,7 +267,7 @@ class PlayerShip(ModelObject):
             self.angle = angle
 
     def _get_acceleration(self, err, vel):
-        """ Computes acceleration so that the ship will accelerat toward the
+        """ Computes acceleration so that the ship will accelerate toward the
         mouse and decelerate as it gets close. """
         if abs(err) < 2 and not vel:
             return 0
@@ -290,12 +290,17 @@ class PlayerShip(ModelObject):
                 accel = -self.max_accel
         else:
             accel = 0
+        print('err={} vel={} eta={} ets={} accel={}'.
+              format(err, vel, eta, ets, accel))
         return accel
 
     def _accelerate(self):
         """ Computes acceleration and adjusts velocity. """
         pos = pygame.mouse.get_pos()
         errv = pos[0] - self.rect.centerx, pos[1] - self.rect.centery
+        self.count += 1
+        print('--- {} --------------------------------------------------'.
+              format(self.count))
         accx = self._get_acceleration(errv[0], self.velocity[0])
         accy = self._get_acceleration(errv[1], self.velocity[1])
         if accx or accy:
