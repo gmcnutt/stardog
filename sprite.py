@@ -235,7 +235,6 @@ class PlayerShip(ModelObject):
         self._layer = PLAYER_LAYER
         self.max_shots = 20
         self.fire_wait_tick = 10
-        self.count = 0
 
     def _fire(self):
         """ Fire if the mouse button is held down. """
@@ -282,34 +281,23 @@ class PlayerShip(ModelObject):
         # ets: estimated time to stop; the time required to reduce vel to 0 at
         # max decel
         ets = abs(vel) / self.max_accel
-        if (ets * self.accel_damp) > eta:
-            # we're going to overshoot, brake hard
-            if vel > 0:
-                accel = max(-self.max_accel, -abs(vel))
-            else:
-                accel = min(self.max_accel, abs(vel))
-        elif eta > 2 and (ets / self.accel_damp) < eta:
-            # two or more ticks until err=0; and plenty of time to stop, so
-            # accelerate
-            if vel > 0:
-                accel = self.max_accel
-            else:
-                accel = -self.max_accel
+        # adjust accel to make eta and ets equal on the next iteration,
+        # assuming constant error
+        import math
+        if err > 0:
+            accel = math.sqrt(err * self.max_accel) - vel
         else:
-            # not going to overshoot but don't have time to decel if we accel,
-            # so cruise
-            accel = 0
-        print('err={} vel={} eta={} ets={} accel={}'.
-              format(err, vel, eta, ets, accel))
+            accel = -vel - math.sqrt(abs(err) * self.max_accel)
+        if accel > 0:
+            accel = min(accel, self.max_accel)
+        else:
+            accel = max(accel, -self.max_accel)
         return accel
 
     def _accelerate(self):
         """ Computes acceleration and adjusts velocity. """
         pos = pygame.mouse.get_pos()
         errv = pos[0] - self.rect.centerx, pos[1] - self.rect.centery
-        self.count += 1
-        print('--- {} --------------------------------------------------'.
-              format(self.count))
         accx = self._get_acceleration(errv[0], self.velocity[0])
         accy = self._get_acceleration(errv[1], self.velocity[1])
         if accx or accy:
