@@ -1,9 +1,9 @@
-# $Revision: 1.1 $
 #
-# Copyright (c) Gordon McNutt, 2011
+# Copyright (c) Gordon McNutt, 2013
 #
 import json
 import pygame
+
 
 class Font(object):
     """ Abstract base class which defines the required fields and methods for
@@ -17,6 +17,7 @@ class Font(object):
 
     def get_dims(self, char):
         raise Exception("Abstract method")
+
 
 class ImageFont(Font):
     """ A Font from an image. """
