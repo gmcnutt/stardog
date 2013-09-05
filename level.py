@@ -39,15 +39,14 @@ class Level(object):
     """ The level holds all the sprites and every frame updates them and
     repaints the screen. """
     def __init__(self, screen=None, 
-                 fps=60, bgd=None, show_boxes=False,
-                 *args, **kwargs):
+                 fps=60, bgd=None, show_boxes=False):
         """
         screen: screen surface
         fps: desired frames per second
         bgd: background object
         show_boxes: True to show bounding boxes
         """
-        super(Level, self).__init__(*args, **kwargs)
+        super(Level, self).__init__()
         self.rect = screen.get_rect()
         self.screen = screen
         self.fps = fps

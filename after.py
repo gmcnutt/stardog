@@ -2,6 +2,7 @@
 # Copyright (c) Gordon McNutt, 2013
 #
 
+import argparse
 import sys
 import pygame
 import random
@@ -126,7 +127,7 @@ class ObjectCounter(ui.Label):
         pygame.display.update(self.rect)
 
 
-def run(screen):
+def run(screen, args):
     level = Level(screen=screen,
                   fps=FPS,
                   bgd=TextureBackground("sand.png"),
@@ -138,8 +139,8 @@ def run(screen):
     level.add(PlayerShip(), level.rect.center)
     level.view(level.player)
 
-    #add_ticks(level, 10)
-    #add_asteroids(level, 100)
+    add_ticks(level, 10)
+    add_asteroids(level, 100)
 
     large_font = font.AfterFont(ROOTDIR + 'large_font.json', IMAGEDIR)
     fps_counter = FpsCounter((0, screen.get_rect().height - 20),
@@ -160,7 +161,7 @@ def run(screen):
                     for k in sorted(hist.keys()):
                         print(k, hist[k])
                     return
-                elif event.unicode == u'n' and 'step' in sys.argv:
+                elif event.unicode == u'n' and args.step:
                     level.update()
                     obj_counter.tick()
                 elif event.key == pygame.K_UP:
@@ -188,7 +189,11 @@ def run(screen):
 
 if __name__ == '__main__':
 
-    args = object()
+    parser = argparse.ArgumentParser(description='An interactive game')
+    parser.add_argument('--step', type=bool, default=False,
+                        help='step one tick at a time')
+    args = parser.parse_args()
+
     pygame.init()
     # screen=pygame.display.set_mode(SIZE),
     #screen=pygame.display.set_mode((0, 0), pygame.FULLSCREEN),
@@ -211,9 +216,9 @@ if __name__ == '__main__':
 
     gui = ui.UI(screen, large_font)
     #gui.prompt("Get Ready!")
-    run(screen)
+    run(screen, args)
     while 'Again!' == gui.choose(['Again!', 'Quit']):
-        run(screen)
+        run(screen, args)
     screen.fill((0, 0, 0))
     pygame.display.update()
     gui.show('Thanks for playing!')
