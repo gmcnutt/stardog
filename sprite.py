@@ -276,19 +276,28 @@ class PlayerShip(ModelObject):
                 return 1
             else:
                 return -1
+        # eta: estimated time of arrival; the time remaining until err=0 at
+        # current vel
         eta = err / vel
+        # ets: estimated time to stop; the time required to reduce vel to 0 at
+        # max decel
         ets = abs(vel) / self.max_accel
         if (ets * self.accel_damp) > eta:
+            # we're going to overshoot, brake hard
             if vel > 0:
                 accel = max(-self.max_accel, -abs(vel))
             else:
                 accel = min(self.max_accel, abs(vel))
         elif eta > 2 and (ets / self.accel_damp) < eta:
+            # two or more ticks until err=0; and plenty of time to stop, so
+            # accelerate
             if vel > 0:
                 accel = self.max_accel
             else:
                 accel = -self.max_accel
         else:
+            # not going to overshoot but don't have time to decel if we accel,
+            # so cruise
             accel = 0
         print('err={} vel={} eta={} ets={} accel={}'.
               format(err, vel, eta, ets, accel))
