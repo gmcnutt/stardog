@@ -3,6 +3,7 @@ sys.path.append('../')
 
 import level
 import model
+import os
 import pygame
 import sprite
 import unittest
@@ -30,7 +31,9 @@ suite = unittest.makeSuite(LoadCheck,'test')
 
 class ModelObjectTest(unittest.TestCase):
     def setUp(self):
-        self.model = model.load('models/oneanim', 6)
+        dirname = os.path.join(os.path.dirname(__file__), '..',
+                               'models', 'sinistar_Bship')
+        self.model = model.load(dirname, 6)
 
     def test_ctor(self):
         modobj = sprite.ModelObject(self.model)
