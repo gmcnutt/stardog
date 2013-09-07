@@ -2,6 +2,7 @@
 # Copyright (c) Gordon McNutt, 2013
 #
 import json
+import os
 import pygame
 
 
@@ -54,7 +55,8 @@ class AfterFont(ImageFont):
     def __init__(self, jsonfile, imagedir):
         """ Make an image file by parsing 'jsonfile'. """
         descr = json.loads(open(jsonfile).read())
-        image = pygame.image.load(imagedir+descr['image_filename'])
+        image = pygame.image.load(os.path.join(imagedir,
+                                               descr['image_filename']))
         rects = {}
         for k, v in descr['rects'].items():
             rects[k] = pygame.Rect(v)

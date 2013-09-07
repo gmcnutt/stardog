@@ -20,8 +20,8 @@ FPS = 60
 MAX_SHOTS = 20
 SCROLL = 50
 ROOTDIR = os.path.dirname(__file__)
-IMAGEDIR = ROOTDIR + "art/png/"
-MODELDIR = ROOTDIR + 'models/'
+IMAGEDIR = os.path.join(ROOTDIR, "art", "png")
+MODELDIR = os.path.join(ROOTDIR, 'models')
 
 
 def align_horz(rect, align):
@@ -61,7 +61,8 @@ class TextureBackground(Background):
 
     def __init__(self, fname, *args, **kwargs):
         super(TextureBackground, self).__init__(*args, **kwargs)
-        self.image = pygame.image.load(IMAGEDIR + fname).convert_alpha()
+        path = os.path.join(IMAGEDIR, fname)
+        self.image = pygame.image.load(path).convert_alpha()
         self.rect = self.image.get_rect()
 
     def blit(self, surf, dest):
@@ -130,8 +131,8 @@ class ObjectCounter(ui.Label):
 def run(screen, args):
     level = Level(screen=screen,
                   fps=FPS,
-                  bgd=TextureBackground("sand.png"),
-                  #bgd=FillBackground((0, 0, 0)),
+                  #bgd=TextureBackground("sand.png"),
+                  bgd=FillBackground((0, 0, 0)),
                   show_boxes=False)
 
     hist = {}
@@ -142,7 +143,8 @@ def run(screen, args):
     add_ticks(level, 10)
     add_asteroids(level, 100)
 
-    large_font = font.AfterFont(ROOTDIR + 'large_font.json', IMAGEDIR)
+    large_font = font.AfterFont(os.path.join(ROOTDIR, 'large_font.json'),
+                                IMAGEDIR)
     fps_counter = FpsCounter((0, screen.get_rect().height - 20),
                              large_font, 'fps: ', screen)
     obj_counter = ObjectCounter((screen.get_rect().width - 300,
@@ -199,7 +201,8 @@ if __name__ == '__main__':
     #screen=pygame.display.set_mode((0, 0), pygame.FULLSCREEN),
     screen = pygame.display.set_mode(SIZE)
     pygame.key.set_repeat(1, 25)
-    large_font = font.AfterFont(ROOTDIR + 'large_font.json', IMAGEDIR)
+    large_font = font.AfterFont(os.path.join(ROOTDIR, 'large_font.json'),
+                                IMAGEDIR)
     pygame.mouse.set_cursor(*pygame.cursors.diamond)
 
     # Load all the models
@@ -212,7 +215,7 @@ if __name__ == '__main__':
                  (sprite.Explosion, 'sinistar_Explode3')
                  ]
     for pair in model_map:
-        pair[0].__model__ = model.load(MODELDIR + pair[1], FPS)
+        pair[0].__model__ = model.load(os.path.join(MODELDIR, pair[1]), FPS)
 
     gui = ui.UI(screen, large_font)
     #gui.prompt("Get Ready!")
