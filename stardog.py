@@ -139,7 +139,9 @@ def run(screen, args):
 
     level.add(PlayerShip(), level.rect.center)
     level.view(level.player)
-
+    
+    level.add(Stardock(angular_velocity=1),
+              (level.rect.center[0] + 100, level.rect.center[1] + 100))
     add_ticks(level, 10)
     add_asteroids(level, 100)
 
@@ -212,7 +214,8 @@ if __name__ == '__main__':
                  (sprite.Asteroid, 'tyrian_rock1a'),
                  (sprite.TickShip, 'sinistar_ship3'),
                  (sprite.TickShot, 'sinistar_bullet_4_3'),
-                 (sprite.Explosion, 'sinistar_Explode3')
+                 (sprite.Explosion, 'sinistar_Explode3'),
+                 (sprite.Stardock, 'sinistar_base')
                  ]
     for pair in model_map:
         pair[0].__model__ = model.load(os.path.join(MODELDIR, pair[1]), FPS)

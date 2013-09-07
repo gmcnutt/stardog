@@ -319,3 +319,7 @@ class Explosion(ModelObject):
         super(Explosion, self).update()
         if self.animation_view.done:
             self.kill()
+
+class Stardock(ModelObject):
+
+    pass

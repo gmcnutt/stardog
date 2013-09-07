@@ -1,0 +1,6 @@
+{
+    "name":"sinistar_base",
+    "description":"A base.",
+    "animations": { "default": { "frames": ["0.png"]}}
+}
+        

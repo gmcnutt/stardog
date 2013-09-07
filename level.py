@@ -176,11 +176,12 @@ class Level(object):
                 pygame.draw.rect(self.screen, white, sprite.rect, 1)
             pygame.draw.rect(self.screen, white, self.scrollrect, 1)
         # Draw player velocity vector line.
-        self.drawn_rects.append(self.player.draw_velocity())
-####        # draw angles
-####        for sprite in self.bases:
-####            if hasattr(sprite, 'draw_angle'):
-####                self.drawn_rects.append(sprite.draw_angle())
+        if self.player.alive():
+            self.drawn_rects.append(self.player.draw_velocity())
+        # # draw angles
+        # for sprite in self.all:
+        #     if hasattr(sprite, 'draw_angle'):
+        #         self.drawn_rects.append(sprite.draw_angle())
         # Paint the minimap.
         self.drawn_rects.append(self.minimap.paint())
         dirty_rects = erased_rects + self.drawn_rects
