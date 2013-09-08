@@ -183,12 +183,17 @@ def run(screen, args, gui):
                     #print('key:{}'.format(event))
                     pass
 
-        if not 'step' in sys.argv:
+        if not args.step:
             level.update()
             obj_counter.tick()
             hist[obj_counter.count] = round(fps_counter.fps)
 
         fps_counter.tick()
+
+        if level.dock:
+            gui.prompt('Docking')
+            level.dock.cooldown = 3 * 60
+            level.dock = None
 
     for k in sorted(hist.keys()):
         print(k, hist[k])
