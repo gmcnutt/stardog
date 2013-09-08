@@ -5,6 +5,7 @@ import vector
 DEFAULT_BORDER = 5
 DEFAULT_BGCOLOR = (94, 94, 94)
 
+
 class Widget(object):
 
     def __init__(self, surf=None, bgcolor=DEFAULT_BGCOLOR):
@@ -35,6 +36,7 @@ class Widget(object):
 
     def onclick(self, pos):
         pass
+
 
 class Label(Widget):
 
@@ -85,7 +87,7 @@ class Container(Widget):
 
     def add(self, widget):
         self.contents.append(widget)
-        
+
     def deliver(self, pos, func):
         for widget in self.contents:
             if widget.rect.collidepoint(pos):
@@ -121,6 +123,7 @@ class Container(Widget):
         for widget in self.contents:
             widget.move(offset)
 
+
 class Wrapper(Container):
 
     def __init__(self, widget, *args, **kwargs):
@@ -137,10 +140,10 @@ class Wrapper(Container):
 
     def layout(self, maxrect):
         self.rect = maxrect.copy()
-        self.widget.layout(maxrect.inflate(-2*DEFAULT_BORDER, 
-                                            -2*DEFAULT_BORDER))
-        self.rect.height = 2*DEFAULT_BORDER + self.widget.rect.height
-        self.rect.width = 2*DEFAULT_BORDER + self.widget.rect.width
+        self.widget.layout(maxrect.inflate(-2 * DEFAULT_BORDER,
+                                           -2 * DEFAULT_BORDER))
+        self.rect.height = 2 * DEFAULT_BORDER + self.widget.rect.height
+        self.rect.width = 2 * DEFAULT_BORDER + self.widget.rect.width
         return self.rect
 
     def center(self, pos):
@@ -151,18 +154,18 @@ class Wrapper(Container):
         super(Wrapper, self).move(pos)
         self.widget.move(pos)
 
-
     def deliver(self, pos, func):
         if self.widget.rect.collidepoint(pos):
             return func(self.widget)
 
-BUTTON_OFF_COLOR = (128, 128, 128)
-BUTTON_ON_COLOR = (255, 128, 64)
 
 class Button(Wrapper):
 
+    OFF_COLOR = (128, 128, 128)
+    ON_COLOR = (255, 128, 64)
+
     def __init__(self, cb, font, text, *args, **kwargs):
-        bgc = BUTTON_OFF_COLOR
+        bgc = self.OFF_COLOR
         label = Label(font, text, bgcolor=bgc, *args, **kwargs)
         super(Button, self).__init__(label, bgcolor=bgc, *args, **kwargs)
         self.cb = cb
@@ -173,13 +176,14 @@ class Button(Wrapper):
         self.cb(self)
 
     def mouseover(self, pos):
-        self.bgcolor = BUTTON_ON_COLOR
-        self.widget.bgcolor = BUTTON_ON_COLOR
+        self.bgcolor = self.ON_COLOR
+        self.widget.bgcolor = self.ON_COLOR
         return self
 
     def mouseoff(self):
-        self.bgcolor = BUTTON_OFF_COLOR
-        self.widget.bgcolor = BUTTON_OFF_COLOR
+        self.bgcolor = self.OFF_COLOR
+        self.widget.bgcolor = self.OFF_COLOR
+
 
 class RunnableMixin(object):
     def __init__(self):
@@ -192,6 +196,7 @@ class RunnableMixin(object):
 
     def run(self):
         undermouse = None
+        saved_background = self.surf.copy()
         while self.running:
             dirtyrect = self.paint(show_boxes=False)
             pygame.display.update(dirtyrect)
@@ -206,15 +211,17 @@ class RunnableMixin(object):
                     undermouse = self.mouseover(event.pos)
             elif event.type == pygame.QUIT:
                 sys.exit()
+        dirtyrect = self.surf.blit(saved_background, (0, 0))
+        pygame.display.update(dirtyrect)
         return self.run_result
-    
+
 
 class OkDialog(Container, RunnableMixin):
 
-    def __init__(self, font, text, *args, **kwargs):        
+    def __init__(self, font, text, *args, **kwargs):
         Container.__init__(self, *args, **kwargs)
         RunnableMixin.__init__(self)
-        self.add(Wrapper(Label(font, text, *args, **kwargs), 
+        self.add(Wrapper(Label(font, text, *args, **kwargs),
                          *args, **kwargs))
         self.add(Wrapper(Button(self.stop, font, 'Ok', *args, **kwargs),
                          *args, **kwargs))
@@ -226,10 +233,11 @@ class OptionDialog(Container, RunnableMixin):
         Container.__init__(self, *args, **kwargs)
         RunnableMixin.__init__(self)
         for option in options:
-            self.add(Wrapper(Button(lambda button: \
-                                        self.stop(button.widget.text), 
-                                    font, option, *args, **kwargs), 
-                             *args, **kwargs))
+            self.add(
+                Wrapper(Button(lambda button: self.stop(button.widget.text),
+                               font, option, *args, **kwargs),
+                        *args, **kwargs))
+
 
 class UI(object):
 
@@ -250,7 +258,7 @@ class UI(object):
     def choose(self, options):
         dialog = OptionDialog(self.font, options, surf=self.screen)
         return self.layout_and_center(dialog).run()
-        
+
     def show(self, msg):
         wrapper = Wrapper(Label(self.font, msg,  surf=self.screen),
                           surf=self.screen)
