@@ -128,7 +128,7 @@ class ObjectCounter(ui.Label):
         pygame.display.update(self.rect)
 
 
-def run(screen, args):
+def run(screen, args, gui):
     level = Level(screen=screen,
                   fps=FPS,
                   #bgd=TextureBackground("sand.png"),
@@ -139,7 +139,7 @@ def run(screen, args):
 
     level.add(PlayerShip(), level.rect.center)
     level.view(level.player)
-    
+
     level.add(Stardock(angular_velocity=1),
               (level.rect.center[0] + 100, level.rect.center[1] + 100))
     add_ticks(level, 10)
@@ -165,6 +165,9 @@ def run(screen, args):
                     for k in sorted(hist.keys()):
                         print(k, hist[k])
                     return
+                elif event.unicode == 'c':
+                    if 'Dock' == gui.choose(['Dock', 'Keep Flying']):
+                        gui.prompt('Not implemented yet!')
                 elif event.unicode == u'n' and args.step:
                     level.update()
                     obj_counter.tick()
@@ -222,9 +225,9 @@ if __name__ == '__main__':
 
     gui = ui.UI(screen, large_font)
     #gui.prompt("Get Ready!")
-    run(screen, args)
+    run(screen, args, gui)
     while 'Again!' == gui.choose(['Again!', 'Quit']):
-        run(screen, args)
+        run(screen, args, gui)
     screen.fill((0, 0, 0))
     pygame.display.update()
     gui.show('Thanks for playing!')
