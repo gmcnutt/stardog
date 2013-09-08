@@ -330,18 +330,26 @@ class Stardock(ModelObject, DocksWithPlayer):
 
     def __init__(self, **kwargs):
         ModelObject.__init__(self, **kwargs)
-        self.cooldown = 0
+        self._cooldown = 0
 
     def _set_image(self, image, *args, **kwargs):
         super(Stardock, self)._set_image(image, *args, **kwargs)
         self.dock_rect = self.rect.inflate(-self.rect.width / 2,
                                            -self.rect.height / 2)
 
+    def start_cooldown(self, ticks):
+        self.animation_view = self.__model__['cooldown'].get_view()
+        self._set_image(self.animation_view.frame)
+        self._cooldown = ticks
+
     def update(self):
         super(Stardock, self).update()
-        if self.cooldown > 0:
-            self.cooldown -= 1
+        if self._cooldown > 0:
+            self._cooldown -= 1
+            if self._cooldown == 0:
+                self.animation_view = self.__model__['default'].get_view()
+                self._set_image(self.animation_view.frame)
 
     @property
     def ready_to_dock(self):
-        return self.cooldown == 0
+        return self._cooldown == 0

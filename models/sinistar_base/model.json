@@ -1,6 +1,7 @@
 {
     "name":"sinistar_base",
     "description":"A base.",
-    "animations": { "default": { "frames": ["0.png"]}}
+    "animations": { "default": { "frames": ["green.png"]},
+                    "cooldown": { "frames": ["yellow.png"]}}
 }
         

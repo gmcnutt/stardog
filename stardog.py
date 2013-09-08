@@ -192,7 +192,7 @@ def run(screen, args, gui):
 
         if level.dock:
             gui.prompt('Docking')
-            level.dock.cooldown = 3 * 60
+            level.dock.start_cooldown(3 * 60)
             level.dock = None
 
     for k in sorted(hist.keys()):
