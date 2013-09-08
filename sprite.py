@@ -327,6 +327,8 @@ class Explosion(ModelObject):
 
 
 class Stardock(ModelObject, DocksWithPlayer):
+    
+    color = (255, 255, 128)
 
     def __init__(self, **kwargs):
         ModelObject.__init__(self, **kwargs)
@@ -334,8 +336,8 @@ class Stardock(ModelObject, DocksWithPlayer):
 
     def _set_image(self, image, *args, **kwargs):
         super(Stardock, self)._set_image(image, *args, **kwargs)
-        self.dock_rect = self.rect.inflate(-self.rect.width / 2,
-                                           -self.rect.height / 2)
+        self.dock_rect = self.rect.inflate(-self.rect.width * 0.90,
+                                           -self.rect.height * 0.90)
 
     def start_cooldown(self, ticks):
         self.animation_view = self.__model__['cooldown'].get_view()
