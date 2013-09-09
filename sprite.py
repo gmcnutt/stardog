@@ -233,18 +233,19 @@ class PlayerShip(ModelObject):
 
     color = (0, 255, 0)
 
-    def __init__(self, **kwargs):
+    def __init__(self, ammo=5, **kwargs):
         super(PlayerShip, self).__init__(**kwargs)
         self.max_accel = 0.25
         self.accel_damp = 1.0
         self._layer = PLAYER_LAYER
         self.max_shots = 20
         self.fire_wait_tick = 10
+        self.ammo = ammo
 
     def _fire(self):
         """ Fire if the mouse button is held down. """
         buttons = pygame.mouse.get_pressed()
-        if buttons[0] and self.fire_wait_tick <= 0:
+        if buttons[0] and self.ammo and self.fire_wait_tick <= 0:
             pos = pygame.mouse.get_pos()
             velocity = vector.subtract(pos, self.rect.center)
             velocity = vector.normalize(velocity)
@@ -253,6 +254,7 @@ class PlayerShip(ModelObject):
             self.level.add(PlayerShot(velocity=list(velocity)),
                            self.maprect.center)
             self.fire_wait_tick = 10
+            self.ammo -= 1
         else:
             self.fire_wait_tick -= 1
 
