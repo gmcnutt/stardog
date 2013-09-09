@@ -101,12 +101,12 @@ class FpsCounter(ui.Label):
     def __init__(self, pos, *args, **kwargs):
         super(FpsCounter, self).__init__(*args, **kwargs)
         self.clock = pygame.time.Clock()
-        self.rect = pygame.Rect((pos), (300, 20))
+        self.rect = pygame.Rect((pos), (100, 20))
         self.fps = 0
 
     def tick(self):
         self.clock.tick(FPS)
-        self.fps = self.clock.get_fps()
+        self.fps = int(self.clock.get_fps())
         self.text = 'FPS:{}'.format(self.fps)
         #self.layout(self.maxrect)
         self.paint()
@@ -117,13 +117,26 @@ class ObjectCounter(ui.Label):
 
     def __init__(self, pos, group, *args, **kwargs):
         super(ObjectCounter, self).__init__(*args, **kwargs)
-        self.rect = pygame.Rect((pos), (300, 20))
+        self.rect = pygame.Rect((pos), (100, 20))
         self.group = group
 
     def tick(self):
         self.count = len(self.group)
         self.text = '{}'.format(self.count)
         #self.layout(self.maxrect)
+        self.paint()
+        pygame.display.update(self.rect)
+
+
+class AmmoCounter(ui.Label):
+    
+    def __init__(self, pos, ship, *args, **kwargs):
+        super(AmmoCounter, self).__init__(*args, **kwargs)
+        self.ship = ship
+        self.rect = pygame.Rect((pos), (100, 20))
+
+    def tick(self):
+        self.text = 'Ammo :{}'.format(self.ship.ammo)
         self.paint()
         pygame.display.update(self.rect)
 
@@ -135,13 +148,15 @@ def run(screen, args, gui):
                   bgd=FillBackground((0, 0, 0)),
                   show_boxes=False)
 
-    hist = {}
-
     level.add(PlayerShip(), level.rect.center)
     level.view(level.player)
 
     level.add(Stardock(angular_velocity=1),
               (level.rect.center[0] + 100, level.rect.center[1] + 100))
+    stardock2 = level.add(Stardock(angular_velocity=1),
+                          (level.rect.center[0] + 5000,
+                           level.rect.center[1] + 5000))
+
     add_ticks(level, 10)
     add_asteroids(level, 100)
 
@@ -149,10 +164,12 @@ def run(screen, args, gui):
                                 IMAGEDIR)
     fps_counter = FpsCounter((0, screen.get_rect().height - 20),
                              large_font, 'fps: ', screen)
-    obj_counter = ObjectCounter((screen.get_rect().width - 300,
-                                 screen.get_rect().height - 20),
-                                level.all,
-                                large_font, '', screen)
+    obj_counter = ObjectCounter((fps_counter.rect.right, fps_counter.rect.top),
+                                level.all, large_font, '', screen)
+    ammo_counter = AmmoCounter((obj_counter.rect.right, obj_counter.rect.top),
+                               level.player, large_font, '', screen)
+    gui.prompt("Proceed to Stardock 2.")
+
 
     level.start()
     loops = 0
@@ -162,8 +179,6 @@ def run(screen, args, gui):
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.unicode == u'q':
-                    for k in sorted(hist.keys()):
-                        print(k, hist[k])
                     return
                 elif event.unicode == 'c':
                     if 'Dock' == gui.choose(['Dock', 'Keep Flying']):
@@ -186,17 +201,19 @@ def run(screen, args, gui):
         if not args.step:
             level.update()
             obj_counter.tick()
-            hist[obj_counter.count] = round(fps_counter.fps)
 
         fps_counter.tick()
+        ammo_counter.tick()
 
         if level.dock:
             gui.prompt('Docking')
+            level.player.fire_wait_tick = 10  # prevent gratuitous shot
+            if level.dock == stardock2:
+                gui.prompt("Mission Completed!")
+                level.player.fire_wait_tick = 10  # prevent gratuitous shot
+            level.player.ammo = 5
             level.dock.start_cooldown(3 * 60)
             level.dock = None
-
-    for k in sorted(hist.keys()):
-        print(k, hist[k])
 
 
 if __name__ == '__main__':
