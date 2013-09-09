@@ -113,6 +113,7 @@ class Level(object):
         if isinstance(sprite, DocksWithPlayer):
             self.docks_with_player.add(sprite)
         self.all.add(sprite)
+        return sprite
 
     def view(self, sprite):
         """ Center the viewrect on the sprite. """
