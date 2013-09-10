@@ -29,6 +29,11 @@ class CollidesWithPlayerShot(object):
     pass
 
 
+class Pickup(object):
+    """ Mix-in used for identification. """
+    pass
+
+
 class BaseSprite(pygame.sprite.DirtySprite):
     def __init__(self):
         super(BaseSprite, self).__init__()
@@ -181,6 +186,17 @@ class Asteroid(ModelObject, CollidesWithPlayer, CollidesWithPlayerShot):
     pass
 
 
+class OreAsteroid(Asteroid):
+    """ Asteroid that yields ore when destroyed. """
+
+    def destroy(self):
+        vel = vector.add(vector.randint(3, 3), self.velocity)
+        self.level.add(Ore(velocity=[vel[0], vel[1]],
+                                angular_velocity=random.randint(0, 5)),
+                       self.maprect.center)
+        super(OreAsteroid, self).destroy()
+
+
 class BigAsteroid(Asteroid):
     """ Rotating destructible rock that spawns smaller rocks when
     destroyed. """
@@ -192,6 +208,10 @@ class BigAsteroid(Asteroid):
             vel = vector.add(vector.randint(3, 3), self.velocity)
             self.level.add(Asteroid(velocity=[vel[0], vel[1]],
                                     angular_velocity=random.randint(0, 5)),
+                           self.maprect.center)
+        if random.randint(0, 10) < 5:
+            self.level.add(OreAsteroid(velocity=[vel[0], vel[1]],
+                                       angular_velocity=random.randint(0, 5)),
                            self.maprect.center)
         super(BigAsteroid, self).destroy()
 
@@ -233,7 +253,7 @@ class PlayerShip(ModelObject):
 
     color = (0, 255, 0)
 
-    def __init__(self, ammo=5, **kwargs):
+    def __init__(self, ammo=50, **kwargs):
         super(PlayerShip, self).__init__(**kwargs)
         self.max_accel = 0.25
         self.accel_damp = 1.0
@@ -241,6 +261,7 @@ class PlayerShip(ModelObject):
         self.max_shots = 20
         self.fire_wait_tick = 10
         self.ammo = ammo
+        self.ore = 0
 
     def _fire(self):
         """ Fire if the mouse button is held down. """
@@ -319,6 +340,9 @@ class PlayerShip(ModelObject):
             self._accelerate()
         self.move(self.velocity)
 
+    def get(self, sprite):
+        self.ore += 1
+
 
 class Explosion(ModelObject):
 
@@ -357,3 +381,9 @@ class Stardock(ModelObject, DocksWithPlayer):
     @property
     def ready_to_dock(self):
         return self._cooldown == 0
+
+
+class Ore(ModelObject, Pickup):
+    """ Ore that the player can pick up. """
+
+    color = (0, 128, 255)

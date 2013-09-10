@@ -141,6 +141,19 @@ class AmmoCounter(ui.Label):
         pygame.display.update(self.rect)
 
 
+class OreCounter(ui.Label):
+    
+    def __init__(self, pos, ship, *args, **kwargs):
+        super(OreCounter, self).__init__(*args, **kwargs)
+        self.ship = ship
+        self.rect = pygame.Rect((pos), (100, 20))
+
+    def tick(self):
+        self.text = 'Ore :{}'.format(self.ship.ore)
+        self.paint()
+        pygame.display.update(self.rect)
+
+
 def run(screen, args, gui):
     level = Level(screen=screen,
                   fps=FPS,
@@ -168,6 +181,8 @@ def run(screen, args, gui):
                                 level.all, large_font, '', screen)
     ammo_counter = AmmoCounter((obj_counter.rect.right, obj_counter.rect.top),
                                level.player, large_font, '', screen)
+    ore_counter = OreCounter((ammo_counter.rect.right, ammo_counter.rect.top),
+                             level.player, large_font, '', screen)
     gui.prompt("Proceed to Stardock 2.")
 
 
@@ -204,6 +219,7 @@ def run(screen, args, gui):
 
         fps_counter.tick()
         ammo_counter.tick()
+        ore_counter.tick()
 
         if level.dock:
             gui.prompt('Docking')
@@ -240,7 +256,9 @@ if __name__ == '__main__':
                  (sprite.TickShip, 'sinistar_ship3'),
                  (sprite.TickShot, 'sinistar_bullet_4_3'),
                  (sprite.Explosion, 'sinistar_Explode3'),
-                 (sprite.Stardock, 'sinistar_base')
+                 (sprite.Stardock, 'sinistar_base'),
+                 (sprite.OreAsteroid, 'ore_asteroid'),
+                 (sprite.Ore, 'ore'),
                  ]
     for pair in model_map:
         pair[0].__model__ = model.load(os.path.join(MODELDIR, pair[1]), FPS)

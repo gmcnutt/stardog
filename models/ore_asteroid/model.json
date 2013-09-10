@@ -1,0 +1,5 @@
+{
+    "name":"Ore Asteroid",
+    "description":"Asteroid that yields ore",
+    "animations": { "default": { "frames": ["0.png"]}}
+}

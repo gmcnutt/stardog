@@ -1,0 +1,5 @@
+{
+    "name":"ore",
+    "description":"Ore from an asteroid",
+    "animations": { "default": { "frames": ["0.png"]}}
+}

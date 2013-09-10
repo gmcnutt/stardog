@@ -70,6 +70,7 @@ class Level(object):
         self.hits_player = pygame.sprite.Group()
         self.hits_player_shot = pygame.sprite.Group()
         self.docks_with_player = pygame.sprite.Group()
+        self.pickups = pygame.sprite.Group()
         self.hot_group = pygame.sprite.LayeredDirty()
         self.player = None
         self.show_boxes = show_boxes
@@ -112,6 +113,8 @@ class Level(object):
             self.hits_player_shot.add(sprite)
         if isinstance(sprite, DocksWithPlayer):
             self.docks_with_player.add(sprite)
+        if isinstance(sprite, Pickup):
+            self.pickups.add(sprite)
         self.all.add(sprite)
         return sprite
 
@@ -227,6 +230,15 @@ class Level(object):
                 other = check_dock(self.player, group)
                 if other:
                     self.dock = other
+        if self.pickups:
+            if self.player.alive():
+                group = [sprite for sprite in self.hot_group if
+                         isinstance(sprite, Pickup)]
+                other = check_collision(self.player, group)
+                if other:
+                    self.player.get(other)
+                    other.kill()
+
 
     def scroll(self, offset):
         """ Scroll the view. """
