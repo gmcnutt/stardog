@@ -148,7 +148,8 @@ class Level(object):
         """ Kill any sprites not completely inside of the culling
         rectangle. """
         for sprite in self.all:
-            if not self.cullrect.contains(sprite.maprect):
+            if not self.cullrect.contains(sprite.maprect) and \
+                    not isinstance(sprite, DocksWithPlayer):
                 sprite.kill()
 
     def update_hot_group(self):
