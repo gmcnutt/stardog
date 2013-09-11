@@ -123,18 +123,30 @@ def run(screen, args, gui):
         clock.tick(FPS)
         return int(clock.get_fps())
 
-    fps_counter = ui.ValueLabel(
-        (0, screen.get_rect().height - 20), "FPS", fps_tick, large_font,
-        '', screen)
+    fps_counter = ui.ValueLabel(pos=(0, screen.get_rect().height - 20),
+                                title="FPS",
+                                value_func=fps_tick,
+                                font=large_font,
+                                surf=screen)
     obj_counter = ui.ValueLabel(
-        (fps_counter.rect.right, fps_counter.rect.top), "Objects",
-        lambda: len(level.all), large_font, '', screen)
+        pos=(fps_counter.rect.right, fps_counter.rect.top),
+        title="Objects",
+        value_func=lambda: len(level.all),
+        font=large_font, 
+        surf=screen)
     ammo_counter = ui.ValueLabel(
-        (obj_counter.rect.right, obj_counter.rect.top), "Ammo",
-        lambda: level.player.ammo, large_font, '', screen)
+        pos=(obj_counter.rect.right, obj_counter.rect.top),
+        title="Ammo",
+        value_func=lambda: level.player.ammo,
+        font=large_font, 
+        surf=screen)
     ore_counter = ui.ValueLabel(
-        (ammo_counter.rect.right, ammo_counter.rect.top), "Ore",
-        lambda: level.player.ore, large_font, '', screen)
+        pos=(ammo_counter.rect.right, ammo_counter.rect.top),
+        title="Ore",
+        value_func=lambda: level.player.ore,
+        font=large_font,
+        surf=screen)
+
     gui.prompt("Proceed to Stardock 2.")
 
 

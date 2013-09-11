@@ -40,9 +40,9 @@ class Widget(object):
 
 class Label(Widget):
 
-    def __init__(self, font, text, *args, **kwargs):
+    def __init__(self, font=None, text=None, **kwargs):
         """ Text label """
-        super(Label, self).__init__(*args, **kwargs)
+        super(Label, self).__init__(**kwargs)
         self.font = font
         self.text = text
         self.lines = []
@@ -82,8 +82,8 @@ class Label(Widget):
 
 class ValueLabel(Label):
     """ Label with a title and a dynamic value. """
-    def __init__(self, pos, title, value_func, *args, **kwargs):
-        super(ValueLabel, self).__init__(*args, **kwargs)
+    def __init__(self, pos=None, title=None, value_func=None, **kwargs):
+        super(ValueLabel, self).__init__(**kwargs)
         self.title = title
         self.value_func = value_func
         self.rect = pygame.Rect((pos), (100, 20))
@@ -96,8 +96,8 @@ class ValueLabel(Label):
 
 class Container(Widget):
 
-    def __init__(self, *args, **kwargs):
-        super(Container, self).__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super(Container, self).__init__(**kwargs)
         self.contents = []
 
     def add(self, widget):
@@ -141,8 +141,8 @@ class Container(Widget):
 
 class Wrapper(Container):
 
-    def __init__(self, widget, *args, **kwargs):
-        super(Wrapper, self).__init__(*args, **kwargs)
+    def __init__(self, widget=None, **kwargs):
+        super(Wrapper, self).__init__(**kwargs)
         self.widget = widget
 
     def add(self, widget):
@@ -179,10 +179,10 @@ class Button(Wrapper):
     OFF_COLOR = (128, 128, 128)
     ON_COLOR = (255, 128, 64)
 
-    def __init__(self, cb, font, text, *args, **kwargs):
+    def __init__(self, cb=None, text=None, font=None, **kwargs):
         bgc = self.OFF_COLOR
-        label = Label(font, text, bgcolor=bgc, *args, **kwargs)
-        super(Button, self).__init__(label, bgcolor=bgc, *args, **kwargs)
+        label = Label(bgcolor=bgc, text=text, font=font, **kwargs)
+        super(Button, self).__init__(widget=label, bgcolor=bgc, **kwargs)
         self.cb = cb
 
     def onclick(self, pos):
@@ -233,25 +233,26 @@ class RunnableMixin(object):
 
 class OkDialog(Container, RunnableMixin):
 
-    def __init__(self, font, text, *args, **kwargs):
-        Container.__init__(self, *args, **kwargs)
+    def __init__(self, text=None, font=None, **kwargs):
+        Container.__init__(self, **kwargs)
         RunnableMixin.__init__(self)
-        self.add(Wrapper(Label(font, text, *args, **kwargs),
-                         *args, **kwargs))
-        self.add(Wrapper(Button(self.stop, font, 'Ok', *args, **kwargs),
-                         *args, **kwargs))
+        self.add(Wrapper(Label(text=text, font=font, **kwargs), **kwargs))
+        self.add(
+            Wrapper(
+                Button(cb=self.stop, text='Ok', font=font, **kwargs), **kwargs))
 
 
 class OptionDialog(Container, RunnableMixin):
 
-    def __init__(self, font, options, *args, **kwargs):
-        Container.__init__(self, *args, **kwargs)
+    def __init__(self, options=None, font=None, **kwargs):
+        Container.__init__(self, **kwargs)
         RunnableMixin.__init__(self)
         for option in options:
             self.add(
-                Wrapper(Button(lambda button: self.stop(button.widget.text),
-                               font, option, *args, **kwargs),
-                        *args, **kwargs))
+                Wrapper(
+                    Button(cb=lambda button: self.stop(button.widget.text),
+                           text=option, font=font, **kwargs),
+                    **kwargs))
 
 
 class UI(object):
@@ -267,15 +268,16 @@ class UI(object):
         return widget
 
     def prompt(self, msg):
-        dialog = OkDialog(self.font, msg, surf=self.screen)
+        dialog = OkDialog(font=self.font, text=msg, surf=self.screen)
         self.layout_and_center(dialog).run()
 
     def choose(self, options):
-        dialog = OptionDialog(self.font, options, surf=self.screen)
+        dialog = OptionDialog(font=self.font, options=options, surf=self.screen)
         return self.layout_and_center(dialog).run()
 
     def show(self, msg):
-        wrapper = Wrapper(Label(self.font, msg,  surf=self.screen),
-                          surf=self.screen)
+        wrapper = Wrapper(
+            widget=Label(font=self.font, text=msg, surf=self.screen),
+            surf=self.screen)
         self.layout_and_center(wrapper)
         pygame.display.update(wrapper.paint())
