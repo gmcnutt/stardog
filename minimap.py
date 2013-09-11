@@ -34,8 +34,8 @@ class LevelMap(ui.Widget):
                 # Note: this next part make big asteroids blink as they rotate
                 # (size oscillates between 0 and 1; change in brightness looks
                 # like a blink)
-#                rect.width = sprite.rect.width / self.scale
-#                rect.height = sprite.rect.height / self.scale
+                #rect.width = sprite.rect.width / self.scale
+                #rect.height = sprite.rect.height / self.scale
                 pygame.draw.rect(self.level.screen, sprite.color, rect)
         return pygame.draw.rect(self.level.screen, (255, 255, 255), self.rect, 
                                 1)

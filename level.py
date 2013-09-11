@@ -3,7 +3,6 @@
 # Copyright (c) Gordon McNutt, 2011
 #
 
-import minimap
 import pygame
 import vector
 
@@ -81,8 +80,6 @@ class Level(object):
                                             self.rect.height)
         self.cullrect = self.rect.inflate(self.rect.width * CULL_FACTOR,
                                           self.rect.height * CULL_FACTOR)
-        self.minimap = minimap.LevelMap(self, 100, (0, 0), surf=self.screen,
-                                        bgcolor=(64, 64, 64))
 
     def __nonzero__(self):
         """ Returns true iff the level is still 'active'. Allows the caller to
@@ -202,8 +199,6 @@ class Level(object):
         # for sprite in self.all:
         #     if hasattr(sprite, 'draw_angle'):
         #         self.drawn_rects.append(sprite.draw_angle())
-        # Paint the minimap.
-        self.drawn_rects.append(self.minimap.paint())
         dirty_rects = erased_rects + self.drawn_rects
         pygame.display.update(dirty_rects)
 

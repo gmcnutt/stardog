@@ -9,6 +9,7 @@ import random
 
 import font
 from level import *
+import minimap
 import model
 import os
 import sprite
@@ -147,6 +148,10 @@ def run(screen, args, gui):
         font=large_font,
         surf=screen)
 
+    mmap = minimap.LevelMap(level, 100, (0, 0), surf=screen,
+                            bgcolor=(64, 64, 64))
+    
+
     gui.prompt("Proceed to Stardock 2.")
 
 
@@ -184,6 +189,8 @@ def run(screen, args, gui):
         fps_counter.tick()
         ammo_counter.tick()
         ore_counter.tick()
+        dirty = mmap.paint()
+        pygame.display.update(dirty)
 
         if level.dock:
             gui.prompt('Docking')
