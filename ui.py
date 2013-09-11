@@ -41,6 +41,7 @@ class Widget(object):
 class Label(Widget):
 
     def __init__(self, font, text, *args, **kwargs):
+        """ Text label """
         super(Label, self).__init__(*args, **kwargs)
         self.font = font
         self.text = text
@@ -77,6 +78,20 @@ class Label(Widget):
         super(Label, self).paint(**kwargs)
         self.font.write(self.surf, self.rect, self.text)
         return self.rect
+
+
+class ValueLabel(Label):
+    """ Label with a title and a dynamic value. """
+    def __init__(self, pos, title, value_func, *args, **kwargs):
+        super(ValueLabel, self).__init__(*args, **kwargs)
+        self.title = title
+        self.value_func = value_func
+        self.rect = pygame.Rect((pos), (100, 20))
+
+    def tick(self):
+        self.text = '{}:{}'.format(self.title, self.value_func())
+        self.paint()
+        pygame.display.update(self.rect)
 
 
 class Container(Widget):

@@ -96,64 +96,6 @@ def add_asteroids(level, num):
                   position)
 
 
-class FpsCounter(ui.Label):
-
-    def __init__(self, pos, *args, **kwargs):
-        super(FpsCounter, self).__init__(*args, **kwargs)
-        self.clock = pygame.time.Clock()
-        self.rect = pygame.Rect((pos), (100, 20))
-        self.fps = 0
-
-    def tick(self):
-        self.clock.tick(FPS)
-        self.fps = int(self.clock.get_fps())
-        self.text = 'FPS:{}'.format(self.fps)
-        #self.layout(self.maxrect)
-        self.paint()
-        pygame.display.update(self.rect)
-
-
-class ObjectCounter(ui.Label):
-
-    def __init__(self, pos, group, *args, **kwargs):
-        super(ObjectCounter, self).__init__(*args, **kwargs)
-        self.rect = pygame.Rect((pos), (100, 20))
-        self.group = group
-
-    def tick(self):
-        self.count = len(self.group)
-        self.text = '{}'.format(self.count)
-        #self.layout(self.maxrect)
-        self.paint()
-        pygame.display.update(self.rect)
-
-
-class AmmoCounter(ui.Label):
-    
-    def __init__(self, pos, ship, *args, **kwargs):
-        super(AmmoCounter, self).__init__(*args, **kwargs)
-        self.ship = ship
-        self.rect = pygame.Rect((pos), (100, 20))
-
-    def tick(self):
-        self.text = 'Ammo :{}'.format(self.ship.ammo)
-        self.paint()
-        pygame.display.update(self.rect)
-
-
-class OreCounter(ui.Label):
-    
-    def __init__(self, pos, ship, *args, **kwargs):
-        super(OreCounter, self).__init__(*args, **kwargs)
-        self.ship = ship
-        self.rect = pygame.Rect((pos), (100, 20))
-
-    def tick(self):
-        self.text = 'Ore :{}'.format(self.ship.ore)
-        self.paint()
-        pygame.display.update(self.rect)
-
-
 def run(screen, args, gui):
     level = Level(screen=screen,
                   fps=FPS,
@@ -175,14 +117,24 @@ def run(screen, args, gui):
 
     large_font = font.AfterFont(os.path.join(ROOTDIR, 'large_font.json'),
                                 IMAGEDIR)
-    fps_counter = FpsCounter((0, screen.get_rect().height - 20),
-                             large_font, 'fps: ', screen)
-    obj_counter = ObjectCounter((fps_counter.rect.right, fps_counter.rect.top),
-                                level.all, large_font, '', screen)
-    ammo_counter = AmmoCounter((obj_counter.rect.right, obj_counter.rect.top),
-                               level.player, large_font, '', screen)
-    ore_counter = OreCounter((ammo_counter.rect.right, ammo_counter.rect.top),
-                             level.player, large_font, '', screen)
+
+    clock = pygame.time.Clock()
+    def fps_tick():
+        clock.tick(FPS)
+        return int(clock.get_fps())
+
+    fps_counter = ui.ValueLabel(
+        (0, screen.get_rect().height - 20), "FPS", fps_tick, large_font,
+        '', screen)
+    obj_counter = ui.ValueLabel(
+        (fps_counter.rect.right, fps_counter.rect.top), "Objects",
+        lambda: len(level.all), large_font, '', screen)
+    ammo_counter = ui.ValueLabel(
+        (obj_counter.rect.right, obj_counter.rect.top), "Ammo",
+        lambda: level.player.ammo, large_font, '', screen)
+    ore_counter = ui.ValueLabel(
+        (ammo_counter.rect.right, ammo_counter.rect.top), "Ore",
+        lambda: level.player.ore, large_font, '', screen)
     gui.prompt("Proceed to Stardock 2.")
 
 
