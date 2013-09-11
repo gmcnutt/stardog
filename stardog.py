@@ -151,9 +151,14 @@ def run(screen, args, gui):
     mmap = minimap.LevelMap(level, 100, (0, 0), surf=screen,
                             bgcolor=(64, 64, 64))
     
+    stats_bar = ui.Container()
+    stats_bar.add(ammo_counter)
+    stats_bar.add(ore_counter)
+    rect = pygame.Rect((mmap.rect.right, mmap.rect.right),
+                       (screen.get_rect().width - mmap.rect.width, 20))
+    stats_bar.layout(rect)
 
     gui.prompt("Proceed to Stardock 2.")
-
 
     level.start()
     loops = 0
@@ -187,9 +192,9 @@ def run(screen, args, gui):
             obj_counter.tick()
 
         fps_counter.tick()
-        ammo_counter.tick()
-        ore_counter.tick()
-        dirty = mmap.paint()
+        #ammo_counter.tick()
+        #ore_counter.tick()
+        dirty = [mmap.paint(), stats_bar.paint()]
         pygame.display.update(dirty)
 
         if level.dock:
