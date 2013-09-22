@@ -135,8 +135,11 @@ def run(screen, args, gui):
         value_func=lambda: len(level.all),
         font=large_font, 
         surf=screen)
+    mmap = minimap.LevelMap(level, 100, (0, 0), surf=screen,
+                            bgcolor=(64, 64, 64))
+    
     ammo_counter = ui.ValueLabel(
-        pos=(obj_counter.rect.right, obj_counter.rect.top),
+        pos=(mmap.rect.right, mmap.rect.top),
         title="Ammo",
         value_func=lambda: level.player.ammo,
         font=large_font, 
@@ -147,16 +150,6 @@ def run(screen, args, gui):
         value_func=lambda: level.player.ore,
         font=large_font,
         surf=screen)
-
-    mmap = minimap.LevelMap(level, 100, (0, 0), surf=screen,
-                            bgcolor=(64, 64, 64))
-    
-    stats_bar = ui.Container()
-    stats_bar.add(ammo_counter)
-    stats_bar.add(ore_counter)
-    rect = pygame.Rect((mmap.rect.right, mmap.rect.right),
-                       (screen.get_rect().width - mmap.rect.width, 20))
-    stats_bar.layout(rect)
 
     gui.prompt("Proceed to Stardock 2.")
 
@@ -186,15 +179,15 @@ def run(screen, args, gui):
                 else:
                     #print('key:{}'.format(event))
                     pass
-
+        dirty = []
         if not args.step:
-            level.update()
-            obj_counter.tick()
+            dirty = level.update()
 
-        fps_counter.tick()
-        #ammo_counter.tick()
-        #ore_counter.tick()
-        dirty = [mmap.paint(), stats_bar.paint()]
+        dirty.append(fps_counter.tick())
+        dirty.append(ammo_counter.tick())
+        dirty.append(ore_counter.tick())
+        dirty.append(mmap.paint())
+        dirty.append(obj_counter.tick())
         pygame.display.update(dirty)
 
         if level.dock:

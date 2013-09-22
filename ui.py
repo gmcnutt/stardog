@@ -14,6 +14,8 @@ class Widget(object):
         self.bgcolor = bgcolor
 
     def paint(self, show_boxes=False):
+        if not self.surf:
+            import pdb; pdb.set_trace()
         self.surf.fill(self.bgcolor, self.rect)
         if show_boxes:
             pygame.draw.rect(self.surf, (255, 255, 255), self.rect, 1)
@@ -71,7 +73,6 @@ class Label(Widget):
         if line != '':
             self.lines.append(line)
             self.rect.height += chrect.height
-        print(self.rect)
         return self.rect
 
     def paint(self, **kwargs):
@@ -81,17 +82,20 @@ class Label(Widget):
 
 
 class ValueLabel(Label):
+
     """ Label with a title and a dynamic value. """
     def __init__(self, pos=None, title=None, value_func=None, **kwargs):
         super(ValueLabel, self).__init__(**kwargs)
         self.title = title
         self.value_func = value_func
         self.rect = pygame.Rect((pos), (100, 20))
+        self.text = '{}:{}'.format(self.title, self.value_func())
 
     def tick(self):
         self.text = '{}:{}'.format(self.title, self.value_func())
         self.paint()
-        pygame.display.update(self.rect)
+        return self.rect
+        #pygame.display.update(self.rect)
 
 
 class Container(Widget):
@@ -137,6 +141,10 @@ class Container(Widget):
         super(Container, self).center(pos)
         for widget in self.contents:
             widget.move(offset)
+
+    def tick(self):
+        for widget in self.contents:
+            widget.tick()
 
 
 class Wrapper(Container):

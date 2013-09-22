@@ -200,7 +200,7 @@ class Level(object):
         #     if hasattr(sprite, 'draw_angle'):
         #         self.drawn_rects.append(sprite.draw_angle())
         dirty_rects = erased_rects + self.drawn_rects
-        pygame.display.update(dirty_rects)
+        #pygame.display.update(dirty_rects)
 
         # Collision checking.
         if self.hits_player:
@@ -234,7 +234,7 @@ class Level(object):
                 if other:
                     self.player.get(other)
                     other.kill()
-
+        return dirty_rects
 
     def scroll(self, offset):
         """ Scroll the view. """
