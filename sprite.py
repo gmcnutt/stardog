@@ -1,3 +1,4 @@
+"""Custom sprites for space objects."""
 #
 # Copyright (c) Gordon McNutt, 2013
 #
@@ -15,39 +16,44 @@ PLAYER_LAYER = 3
 
 
 class CollidesWithPlayer(object):
-    """ Mix-in used for identification. """
+    """Mix-in used for identification."""
     pass
 
 
 class DocksWithPlayer(object):
-    """ Mix-in used for identification. """
+    """Mix-in used for identification."""
     pass
 
 
 class CollidesWithPlayerShot(object):
-    """ Mix-in used for identification. """
+    """Mix-in used for identification."""
     pass
 
 
 class Pickup(object):
-    """ Mix-in used for identification. """
+    """Mix-in used for identification."""
     pass
 
 
 class BaseSprite(pygame.sprite.DirtySprite):
+    """A sprite with a rect for collision detection and a maprect for showing
+    in a viewer.
+    """
     def __init__(self):
         super(BaseSprite, self).__init__()
-        self.dirty = 2
+        self.dirty = 2  #  Always dirty (repainted each frame)
         self._layer = DEFAULT_LAYER
-        self.maprect = None
-        self.rect = None
+        self.maprect = None  # Offset from map viewer ULC
+        self.rect = None  # Offset from universal ULC
 
     def move(self, offset):
+        """Move the sprite by 'offset'."""
         if offset[0] or offset[1]:
             self.rect.move_ip(offset)
             self.maprect.move_ip(offset)
 
     def destroy(self):
+        """Explode and exit stage."""
         self.level.add(Explosion(), self.maprect.center)
         self.kill()
 
@@ -62,15 +68,15 @@ class BaseSprite(pygame.sprite.DirtySprite):
 
 
 class EnemyShip(object):
-    """ Abstract mix-in for classification. """
+    """Abstract mix-in for classification."""
     color = (255, 0, 0)
-    pass
 
 
 class ModelObject(BaseSprite):
-    """ A sprite that gets its images from a model (a table of
+    """A sprite that gets its images from a model (a table of
     animations). Subclasses should override the class instance variable
-    __model__. """
+    __model__.
+    """
 
     __model__ = None
 
@@ -86,9 +92,9 @@ class ModelObject(BaseSprite):
         self.angle = 0
 
     def _set_image(self, image, original=True, remask=True):
-        """ Set the current sprite image and rect and rebuild the collision
+        """Set the current sprite image and rect and rebuild the collision
         mask. Unless rotated remember this as the original prior to
-        rotation. """
+        rotation."""
         self.image = image
         if remask:
             self.mask = pygame.mask.from_surface(self.image)
@@ -100,12 +106,12 @@ class ModelObject(BaseSprite):
             self.original_image = image
 
     def pre_render(self):
-        """ Prepare to blit the image. """
+        """Prepare to blit the image."""
         if self.angle:
             self._rotate_image()
 
     def _rotate_image(self):
-        """ Rotate the current image and update the rect and collision
+        """Rotate the current image and update the rect and collision
         mask. Recenters the rotated image in the old location."""
         center = self.rect.center
         image = pygame.transform.rotate(self.original_image, self.angle)
@@ -113,14 +119,14 @@ class ModelObject(BaseSprite):
         self.rect.center = center
 
     def update(self):
-        """ Update the animation then move and rotate. """
+        """Update the animation then move and rotate."""
         if self.animation_view.update():
             self._set_image(self.animation_view.frame, remask=False)
         self.move(self.velocity)
         self.angle += self.angular_velocity
 
     def draw_angle(self):
-        """ Draw a line representing the angle """
+        """Draw a line representing the angle """
         direction = vector.from_angle(self.angle)
         vect = vector.scalar_multiply(direction, 20)
         endpos = vector.add(self.rect.center, vect)
@@ -129,7 +135,7 @@ class ModelObject(BaseSprite):
                                 endpos)
 
     def draw_velocity(self):
-        """ Draw a line representing the velocity. """
+        """Draw a line representing the velocity."""
         vect = vector.scalar_multiply(self.velocity, 10)
         endpos = vector.add(self.rect.center, vect)
         return pygame.draw.line(self.level.screen, (0, 255, 255),
@@ -181,13 +187,13 @@ class TickShip(ModelObject, EnemyShip, CollidesWithPlayer,
 
 
 class Asteroid(ModelObject, CollidesWithPlayer, CollidesWithPlayerShot):
-    """ Rotating destructible rock. """
+    """Rotating destructible rock."""
     color = (160, 160, 160)
     pass
 
 
 class OreAsteroid(Asteroid):
-    """ Asteroid that yields ore when destroyed. """
+    """Asteroid that yields ore when destroyed."""
 
     def destroy(self):
         vel = vector.add(vector.randint(3, 3), self.velocity)
@@ -198,12 +204,12 @@ class OreAsteroid(Asteroid):
 
 
 class BigAsteroid(Asteroid):
-    """ Rotating destructible rock that spawns smaller rocks when
-    destroyed. """
+    """Rotating destructible rock that spawns smaller rocks when
+    destroyed."""
     color = (128, 128, 128)
 
     def destroy(self):
-        """ Spawn 0-2 child asteroids. """
+        """Spawn 0-2 child asteroids."""
         for i in range(2):
             vel = vector.add(vector.randint(3, 3), self.velocity)
             self.level.add(Asteroid(velocity=[vel[0], vel[1]],
@@ -217,7 +223,7 @@ class BigAsteroid(Asteroid):
 
 
 class PlayerShot(ModelObject):
-    """ Bullet sprite. """
+    """Bullet sprite."""
     # To make shots more accurate, overload move(), update() and scroll() so
     # that instead of incrementing the rects recompute them from the
     # origin. The normal method of simply incrementing the rects causes
@@ -249,7 +255,7 @@ class PlayerShot(ModelObject):
 
 
 class PlayerShip(ModelObject):
-    """ The player's ship. Responds to mouse position and buttons. """
+    """The player's ship. Responds to mouse position and buttons."""
 
     color = (0, 255, 0)
 
@@ -264,7 +270,7 @@ class PlayerShip(ModelObject):
         self.ore = 0
 
     def _fire(self):
-        """ Fire if the mouse button is held down. """
+        """Fire if the mouse button is held down."""
         buttons = pygame.mouse.get_pressed()
         if buttons[0] and self.ammo and self.fire_wait_tick <= 0:
             pos = pygame.mouse.get_pos()
@@ -280,7 +286,7 @@ class PlayerShip(ModelObject):
             self.fire_wait_tick -= 1
 
     def _rotate(self):
-        """ Rotate the ship to face the current mouse position. """
+        """Rotate the ship to face the current mouse position."""
         mousepos = pygame.mouse.get_pos()
         dx = self.rect.centerx - mousepos[0]
         dy = self.rect.centery - mousepos[1]
@@ -294,8 +300,8 @@ class PlayerShip(ModelObject):
             self.angle = angle
 
     def _get_acceleration(self, err, vel):
-        """ Computes acceleration so that the ship will accelerate toward the
-        mouse and decelerate as it gets close. """
+        """Computes acceleration so that the ship will accelerate toward the
+        mouse and decelerate as it gets close."""
         if abs(err) < 2 and not vel:
             return 0
         if not vel:
@@ -323,7 +329,7 @@ class PlayerShip(ModelObject):
         return accel
 
     def _accelerate(self):
-        """ Computes acceleration and adjusts velocity. """
+        """Computes acceleration and adjusts velocity."""
         pos = pygame.mouse.get_pos()
         errv = pos[0] - self.rect.centerx, pos[1] - self.rect.centery
         accx = self._get_acceleration(errv[0], self.velocity[0])
@@ -333,7 +339,7 @@ class PlayerShip(ModelObject):
                 self.velocity[1] + accy
 
     def update(self):
-        """ Fire, rotate and move. """
+        """Fire, rotate and move."""
         self._fire()
         self._rotate()
         if not (pygame.KMOD_SHIFT & pygame.key.get_mods()):
@@ -345,7 +351,7 @@ class PlayerShip(ModelObject):
 
 
 class Explosion(ModelObject):
-
+    """An explosion."""
     def update(self):
         super(Explosion, self).update()
         if self.animation_view.done:
@@ -353,7 +359,7 @@ class Explosion(ModelObject):
 
 
 class Stardock(ModelObject, DocksWithPlayer):
-    
+    """The player can dock here."""
     color = (255, 255, 128)
 
     def __init__(self, **kwargs):
@@ -384,6 +390,5 @@ class Stardock(ModelObject, DocksWithPlayer):
 
 
 class Ore(ModelObject, Pickup):
-    """ Ore that the player can pick up. """
-
+    """Ore that the player can pick up."""
     color = (0, 128, 255)

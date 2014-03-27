@@ -1,5 +1,5 @@
 #
-# Copyright (c) Gordon McNutt, 2013
+# Copyright (c) Gordon McNutt, 2013, 2014
 #
 
 import argparse
@@ -100,7 +100,6 @@ def add_asteroids(level, num):
 def run(screen, args, gui):
     level = Level(screen=screen,
                   fps=FPS,
-                  #bgd=TextureBackground("sand.png"),
                   bgd=FillBackground((0, 0, 0)),
                   show_boxes=False)
 
@@ -162,9 +161,6 @@ def run(screen, args, gui):
             elif event.type == pygame.KEYDOWN:
                 if event.unicode == u'q':
                     return
-                elif event.unicode == 'c':
-                    if 'Dock' == gui.choose(['Dock', 'Keep Flying']):
-                        gui.prompt('Not implemented yet!')
                 elif event.unicode == u'n' and args.step:
                     level.update()
                     obj_counter.tick()
@@ -206,12 +202,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='An interactive game')
     parser.add_argument('--step', type=bool, default=False,
                         help='step one tick at a time')
+    parser.add_argument('--notfullscreen', default=False,
+                        action='store_true',
+                        help='Run in a window instead of fullscreen')
     args = parser.parse_args()
 
     pygame.init()
-    # screen=pygame.display.set_mode(SIZE),
-    #screen=pygame.display.set_mode((0, 0), pygame.FULLSCREEN),
-    screen = pygame.display.set_mode(SIZE)
+    if args.notfullscreen:
+        screen = pygame.display.set_mode(SIZE)
+    else:
+        screen=pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     pygame.key.set_repeat(1, 25)
     large_font = font.AfterFont(os.path.join(ROOTDIR, 'large_font.json'),
                                 IMAGEDIR)
@@ -233,7 +233,6 @@ if __name__ == '__main__':
         pair[0].__model__ = model.load(os.path.join(MODELDIR, pair[1]), FPS)
 
     gui = ui.UI(screen, large_font)
-    #gui.prompt("Get Ready!")
     run(screen, args, gui)
     while 'Again!' == gui.choose(['Again!', 'Quit']):
         run(screen, args, gui)

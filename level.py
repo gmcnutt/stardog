@@ -237,7 +237,7 @@ class Level(object):
         return dirty_rects
 
     def scroll(self, offset):
-        """ Scroll the view. """
+        """Scroll the view by 'offset'."""
         # Clamp the view to the maprect. Subtle: the sprites are offset in the
         # opposite direction.
         clamped_rect = self.viewrect.move(offset)
