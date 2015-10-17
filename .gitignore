@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Compiled source #
 ###################
 *.com
@@ -46,9 +45,8 @@ Thumbs.db
 *.p
 venv
 .#*
-PLAN
-=======
 *.py[cod]
+*~
 
 # C extensions
 *.so
@@ -79,8 +77,3 @@ nosetests.xml
 # Translations
 *.mo
 
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
->>>>>>> becdf04fc73cf7a4e87a3e53ac3df8dccae270e4
