@@ -38,6 +38,33 @@ def align_vert(rect, align):
     rect.top -= lm
     rect.height += (lm + rm)
 
+class UI(object):
+
+    def __init__(self, screen, font):
+        self.screen = screen
+        self.font = font
+
+    def layout_and_center(self, widget):
+        maxrect = self.screen.get_rect()
+        widget.layout(maxrect)
+        widget.center(maxrect.center)
+        return widget
+
+    def prompt(self, msg):
+        dialog = ui.OkDialog(font=self.font, text=msg, surf=self.screen)
+        self.layout_and_center(dialog).run()
+
+    def choose(self, options):
+        dialog = ui.OptionDialog(font=self.font, options=options, surf=self.screen)
+        return self.layout_and_center(dialog).run()
+
+    def show(self, msg):
+        wrapper = ui.Wrapper(
+            widget=Label(font=self.font, text=msg, surf=self.screen),
+            surf=self.screen)
+        self.layout_and_center(wrapper)
+        pygame.display.update(wrapper.paint())
+
 
 class Background(object):
 
@@ -234,7 +261,7 @@ if __name__ == '__main__':
     for pair in model_map:
         pair[0].__model__ = model.load(os.path.join(MODELDIR, pair[1]), FPS)
 
-    gui = ui.UI(screen, large_font)
+    gui = UI(screen, large_font)
     run(screen, args, gui)
     while 'Again!' == gui.choose(['Again!', 'Quit']):
         run(screen, args, gui)
