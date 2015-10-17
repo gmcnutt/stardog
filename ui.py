@@ -88,7 +88,7 @@ class ValueLabel(Label):
         super(ValueLabel, self).__init__(**kwargs)
         self.title = title
         self.value_func = value_func
-        self.rect = pygame.Rect((pos), (100, 20))
+        self.rect = pygame.Rect((pos), (150, 20))
         self.text = '{}:{}'.format(self.title, self.value_func())
 
     def tick(self):

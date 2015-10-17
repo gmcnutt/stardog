@@ -48,8 +48,8 @@ def check_dock(sprite, sprites):
 class Level(object):
     """ The level holds all the sprites and every frame updates them and
     repaints the screen. """
-    def __init__(self, screen=None,
-                 fps=60, bgd=None, show_boxes=False):
+    def __init__(self, screen=None, fps=60, bgd=None, show_boxes=False,
+                 show_grid=False):
         """
         screen: screen surface
         fps: desired frames per second
@@ -73,6 +73,7 @@ class Level(object):
         self.hot_group = pygame.sprite.LayeredDirty()
         self.player = None
         self.show_boxes = show_boxes
+        self.show_grid = show_grid
         self.viewrect = pygame.Rect((0, 0), self.rect.size)
         self.scrollrect = self.rect.inflate(self.rect.width / 6 -
                                             self.rect.width,
@@ -121,13 +122,16 @@ class Level(object):
         self.scroll(offset)
 
     def start(self):
-        """ Blit the background for the first time before calling update. """
+        """Blit the background for the first time before calling update."""
         self.bgd.blit(self.screen, self.rect)
         pygame.display.flip()
 
     def paint_grid(self):
-        """ Paint a grid on the background. Returns the list of dirty
-        rectangles. """
+        """Paint a grid on the background.
+
+        Returns the list of dirty rectangles.
+
+        """
         dirty = []
         x = GRID_SIZE - (self.viewrect.left % GRID_SIZE)
         while x < self.rect.right:
@@ -142,8 +146,7 @@ class Level(object):
         return dirty
 
     def cull(self):
-        """ Kill any sprites not completely inside of the culling
-        rectangle. """
+        """Kill sprites outside the culling rectangle."""
         for sprite in self.all:
             if not self.cullrect.contains(sprite.maprect) and \
                     not isinstance(sprite, DocksWithPlayer):
@@ -183,7 +186,8 @@ class Level(object):
         # Reset the drawn rects to empty before we start painting sprites.
         self.drawn_rects = []
         # Paint the grid.
-        self.drawn_rects += self.paint_grid()
+        if self.show_grid:
+            self.drawn_rects += self.paint_grid()
         # Gather sprites into the hot group and render it.
         self.update_hot_group()
         self.drawn_rects += self.hot_group.draw(self.screen)

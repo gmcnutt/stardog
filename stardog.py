@@ -192,7 +192,7 @@ def run(screen, args, gui):
             if level.dock == stardock2:
                 gui.prompt("Mission Completed!")
                 level.player.fire_wait_tick = 10  # prevent gratuitous shot
-            level.player.ammo = 5
+            level.player.ammo = 500
             level.dock.start_cooldown(3 * 60)
             level.dock = None
 

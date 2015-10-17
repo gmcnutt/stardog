@@ -259,7 +259,7 @@ class PlayerShip(ModelObject):
 
     color = (0, 255, 0)
 
-    def __init__(self, ammo=50, **kwargs):
+    def __init__(self, ammo=500, **kwargs):
         super(PlayerShip, self).__init__(**kwargs)
         self.max_accel = 0.25
         self.accel_damp = 1.0
