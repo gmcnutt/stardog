@@ -38,6 +38,7 @@ def align_vert(rect, align):
     rect.top -= lm
     rect.height += (lm + rm)
 
+
 class UI(object):
 
     def __init__(self, screen, font):
@@ -55,12 +56,13 @@ class UI(object):
         self.layout_and_center(dialog).run()
 
     def choose(self, options):
-        dialog = ui.OptionDialog(font=self.font, options=options, surf=self.screen)
+        dialog = ui.OptionDialog(font=self.font, options=options,
+                                 surf=self.screen)
         return self.layout_and_center(dialog).run()
 
     def show(self, msg):
         wrapper = ui.Wrapper(
-            widget=Label(font=self.font, text=msg, surf=self.screen),
+            widget=ui.Label(font=self.font, text=msg, surf=self.screen),
             surf=self.screen)
         self.layout_and_center(wrapper)
         pygame.display.update(wrapper.paint())

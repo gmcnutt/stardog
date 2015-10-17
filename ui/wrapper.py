@@ -3,6 +3,7 @@ from . import Container
 
 
 class Wrapper(Container):
+    """Wraps an empty border around another widget."""
 
     def __init__(self, widget=None, **kwargs):
         super(Wrapper, self).__init__(**kwargs)

@@ -1,5 +1,6 @@
 from . import Container, Runnable, Wrapper, Button, Label
 
+
 class OkDialog(Container, Runnable):
 
     def __init__(self, text=None, font=None, **kwargs):

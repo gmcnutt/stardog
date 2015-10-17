@@ -14,14 +14,14 @@ class Font(object):
         self.max_height = 0
 
     def write(self, surf, rect, text):
-        raise Exception("Abstract method")
+        raise NotImplemented("Abstract method")
 
     def get_dims(self, char):
-        raise Exception("Abstract method")
+        raise NotImplemented("Abstract method")
 
 
 class ImageFont(Font):
-    """ A Font from an image. """
+    """A Font from an image."""
 
     def __init__(self, image, rects):
         """ Make a font from Surface 'image', where the position of each letter

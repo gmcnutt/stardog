@@ -10,8 +10,6 @@ class Widget(object):
         self.bgcolor = bgcolor
 
     def paint(self, show_boxes=False):
-        if not self.surf:
-            import pdb; pdb.set_trace()
         self.surf.fill(self.bgcolor, self.rect)
         if show_boxes:
             pygame.draw.rect(self.surf, (255, 255, 255), self.rect, 1)
