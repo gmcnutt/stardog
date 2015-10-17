@@ -101,7 +101,7 @@ def run(screen, args, gui):
     level = Level(screen=screen,
                   fps=FPS,
                   bgd=FillBackground((0, 0, 0)),
-                  show_boxes=False)
+                  show_boxes=False, show_grid=args.grid)
 
     level.add(PlayerShip(), level.rect.center)
     level.view(level.player)
@@ -205,6 +205,8 @@ if __name__ == '__main__':
     parser.add_argument('--notfullscreen', default=False,
                         action='store_true',
                         help='Run in a window instead of fullscreen')
+    parser.add_argument('--grid', default=False, action='store_true',
+                        help='Show grid')
     args = parser.parse_args()
 
     pygame.init()
