@@ -1,20 +1,17 @@
-#
-# Copyright (c) Gordon McNutt, 2013, 2014
-#
+"""Stardog - a 2d space shooter game."""
 
-import argparse
-import sys
-import pygame
-import random
-
-import font
 from level import *
+import argparse
+import font
 import minimap
 import model
 import os
+import pygame
+import random
 import sprite
-import vector
+import sys
 import ui
+import vector
 
 SIZE = WIDTH, HEIGHT = 480 * 2, 480 * 2
 FPS = 60
@@ -132,12 +129,12 @@ def run(screen, args, gui):
                   bgd=FillBackground((0, 0, 0)),
                   show_boxes=False, show_grid=args.grid)
 
-    level.add(PlayerShip(), level.rect.center)
+    level.add(sprite.PlayerShip(), level.rect.center)
     level.view(level.player)
 
-    level.add(Stardock(angular_velocity=1),
+    level.add(sprite.Stardock(angular_velocity=1),
               (level.rect.center[0] + 100, level.rect.center[1] + 100))
-    stardock2 = level.add(Stardock(angular_velocity=1),
+    stardock2 = level.add(sprite.Stardock(angular_velocity=1),
                           (level.rect.center[0] + 5000,
                            level.rect.center[1] + 5000))
 

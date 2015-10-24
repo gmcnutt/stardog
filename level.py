@@ -5,8 +5,7 @@
 
 import pygame
 import vector
-
-from sprite import *
+import sprite as spaceobj
 
 white = 255, 255, 255
 GRID_COLOR = 128, 128, 128
@@ -14,9 +13,12 @@ GRID_SIZE = 500
 CULL_FACTOR = 10
 
 
-def check_collision(sprite, sprites):
-    """ Check if 'sprite' collides with any sprite S in 'group'. Returns first
-    such S found or None. """
+def _check_collision(sprite, sprites):
+    """Check for collision between a sprite and a group of sprites.
+
+    Returns first sprite found or None. Uses the collision masks.
+
+    """
     for other in sprites:
         if sprite.rect.colliderect(other.rect):
             if pygame.sprite.collide_mask(sprite, other):
@@ -24,9 +26,13 @@ def check_collision(sprite, sprites):
     return None
 
 
-def check_group_collision(group1, group2):
-    """ Check if any sprite S1 in 'group1' collides with any sprite S2 in
-    'group2'. Returns a list of all (S1, S2) pairs found or None. """
+def _check_group_collision(group1, group2):
+    """Check for collision between two groups of sprites.
+
+    Returns a list of tuples (sprite1, sprite2) or None. Uses
+    collision masks.
+
+    """
     hits = []
     for spr1 in group1:
         for spr2 in group2.sprites():
@@ -36,9 +42,13 @@ def check_group_collision(group1, group2):
     return hits
 
 
-def check_dock(sprite, sprites):
-    """ Check if 'sprite' docks with any sprite S in 'group'. Returns first
-    such S found or None. """
+def _check_dock(sprite, sprites):
+    """Check for collision between a sprite and a group of sprites.
+
+    Returns first sprite found or None. Does NOT check the collision
+    mask, just the bounding rectangles. XXX: why not?
+
+    """
     for other in sprites:
         if sprite.rect.colliderect(other.dock_rect):
             return other
@@ -83,12 +93,15 @@ class Level(object):
                                           self.rect.height * CULL_FACTOR)
 
     def __nonzero__(self):
-        """ Returns true iff the level is still 'active'. Allows the caller to
-        use an expression like this for the main loop:
+        """Return true iff the level is still 'active'.
+
+        Allows the caller to use an expression like this for the main
+        loop:
 
         while mylevel:
             mylevel.update()
             # do other per-frame activities
+
         """
         if (self.player and self.player.alive()) or self.explosions:
             return True
@@ -96,33 +109,41 @@ class Level(object):
             return False
 
     def add(self, sprite, maploc):
-        """ Add a sprite to the level. This classifies the sprite based on its
-        class type (for collision checking) and assigns its map location. """
+        """Add a sprite to the level.
+
+        This classifies the sprite based on its class type (for
+        collision checking) and assigns its map location.
+
+        """
         sprite.put_at(self, maploc)
-        if isinstance(sprite, Explosion):
+        if isinstance(sprite, spaceobj.Explosion):
             self.explosions.add(sprite)
-        elif isinstance(sprite, PlayerShot):
+        elif isinstance(sprite, spaceobj.PlayerShot):
             self.player_shots.add(sprite)
-        elif isinstance(sprite, PlayerShip):
+        elif isinstance(sprite, spaceobj.PlayerShip):
             self.player = sprite
-        if isinstance(sprite, CollidesWithPlayer):
+        if isinstance(sprite, spaceobj.CollidesWithPlayer):
             self.hits_player.add(sprite)
-        if isinstance(sprite, CollidesWithPlayerShot):
+        if isinstance(sprite, spaceobj.CollidesWithPlayerShot):
             self.hits_player_shot.add(sprite)
-        if isinstance(sprite, DocksWithPlayer):
+        if isinstance(sprite, spaceobj.DocksWithPlayer):
             self.docks_with_player.add(sprite)
-        if isinstance(sprite, Pickup):
+        if isinstance(sprite, spaceobj.Pickup):
             self.pickups.add(sprite)
         self.all.add(sprite)
         return sprite
 
     def view(self, sprite):
-        """ Center the viewrect on the sprite. """
+        """Center the viewrect on the sprite."""
         offset = vector.subtract(sprite.rect.center, self.viewrect.center)
         self.scroll(offset)
 
     def start(self):
-        """Blit the background for the first time before calling update."""
+        """Start the level.
+
+        Call once before calling update() or scroll().
+
+        """
         self.bgd.blit(self.screen, self.rect)
         pygame.display.flip()
 
@@ -149,10 +170,11 @@ class Level(object):
         """Kill sprites outside the culling rectangle."""
         for sprite in self.all:
             if not self.cullrect.contains(sprite.maprect) and \
-                    not isinstance(sprite, DocksWithPlayer):
+                    not isinstance(sprite, spaceobj.DocksWithPlayer):
                 sprite.kill()
 
     def update_hot_group(self):
+        """Rebuild the list of visible sprites."""
         self.hot_group.empty()
         for sprite in self.all:
             if self.viewrect.colliderect(sprite.maprect):
@@ -160,9 +182,13 @@ class Level(object):
                 sprite.pre_render()
 
     def update(self):
-        """ Called every frame. Erases the dirty rects from the last update and
-        makes some more! This handles scrolling, updating all the sprites,
-        repainting them, and checking for collisions."""
+        """Animate, run AI and handle collisions.
+
+        Should be called every frame. Erases the dirty rects from the
+        last update and makes some more. Handles scrolling, updating
+        all the sprites, repainting them, and checking for collisions.
+
+        """
         # Erase the rects drawn last time we were in update by blitting the
         # background over them.
         for drect in self.drawn_rects:
@@ -210,38 +236,38 @@ class Level(object):
         if self.hits_player:
             if self.player.alive():
                 group = [sprite for sprite in self.hot_group if
-                         isinstance(sprite, CollidesWithPlayer)]
-                other = check_collision(self.player, group)
+                         isinstance(sprite, spaceobj.CollidesWithPlayer)]
+                other = _check_collision(self.player, group)
                 if other:
                     other.destroy()
                     self.player.destroy()
         if self.hits_player_shot:
             group = [sprite for sprite in self.hot_group if
-                     isinstance(sprite, CollidesWithPlayerShot)]
-            hits = check_group_collision(group, self.player_shots)
+                     isinstance(sprite, spaceobj.CollidesWithPlayerShot)]
+            hits = _check_group_collision(group, self.player_shots)
             for hit in hits:
                 hit[0].destroy()
                 hit[1].destroy()
         if self.docks_with_player:
             if self.player.alive():
                 group = [sprite for sprite in self.hot_group if
-                         isinstance(sprite, DocksWithPlayer)
+                         isinstance(sprite, spaceobj.DocksWithPlayer)
                          and sprite.ready_to_dock]
-                other = check_dock(self.player, group)
+                other = _check_dock(self.player, group)
                 if other:
                     self.dock = other
         if self.pickups:
             if self.player.alive():
                 group = [sprite for sprite in self.hot_group if
-                         isinstance(sprite, Pickup)]
-                other = check_collision(self.player, group)
+                         isinstance(sprite, spaceobj.Pickup)]
+                other = _check_collision(self.player, group)
                 if other:
                     self.player.get(other)
                     other.kill()
         return dirty_rects
 
     def scroll(self, offset):
-        """Scroll the view by 'offset'."""
+        """Scroll the view."""
         # Clamp the view to the maprect. Subtle: the sprites are offset in the
         # opposite direction.
         clamped_rect = self.viewrect.move(offset)
@@ -253,8 +279,13 @@ class Level(object):
             sprite.scroll(clamped_offset)
 
     def get_offscreen_position(self, size):
-        """ Get a random position for a rect of size 'size' within the cullrect
-        but outside the viewrect."""
+        """Get a randomly located offscreen rectangle.
+
+        Get a random position for a rect of size 'size' within the
+        cullrect but outside the viewrect. This is for adding sprites
+        to the level so they don't appear to "teleport" into view.
+
+        """
         position = vector.randintrect(self.cullrect)
         rect = pygame.Rect(position, size)
         while self.viewrect.contains(rect):
