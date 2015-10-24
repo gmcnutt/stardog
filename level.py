@@ -246,7 +246,7 @@ class Level(object):
                      isinstance(sprite, spaceobj.CollidesWithPlayerShot)]
             hits = _check_group_collision(group, self.player_shots)
             for hit in hits:
-                hit[0].destroy()
+                hit[0].hit()
                 hit[1].destroy()
         if self.docks_with_player:
             if self.player.alive():

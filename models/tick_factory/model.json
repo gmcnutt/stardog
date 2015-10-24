@@ -1,0 +1,7 @@
+{
+    "name":"tick_factory",
+    "description":"A factory ship.",
+    "animations": { "default": { "frames": ["tick_factory.png"]},
+                    "damaged": { "frames": ["tick_factory_damaged.png"]}}
+}
+        

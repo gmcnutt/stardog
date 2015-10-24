@@ -39,12 +39,13 @@ class BaseSprite(pygame.sprite.DirtySprite):
     """A sprite with a rect for collision detection and a maprect for showing
     in a viewer.
     """
-    def __init__(self):
+    def __init__(self, fps=60):
         super(BaseSprite, self).__init__()
         self.dirty = 2  #  Always dirty (repainted each frame)
         self._layer = DEFAULT_LAYER
         self.maprect = None  # Offset from map viewer ULC
         self.rect = None  # Offset from universal ULC
+        self.fps = fps
 
     def move(self, offset):
         """Move the sprite by 'offset'."""
@@ -66,8 +67,12 @@ class BaseSprite(pygame.sprite.DirtySprite):
         self.maprect.center = maploc
         self.rect.center = vector.subtract(maploc, level.viewrect.topleft)
 
+    def hit(self):
+        """Take damage."""
+        self.destroy()
 
-class EnemyShip(object):
+
+class EnemyShip(CollidesWithPlayer, CollidesWithPlayerShot):
     """Abstract mix-in for classification."""
     color = (255, 0, 0)
 
@@ -144,6 +149,7 @@ class ModelObject(BaseSprite):
 
 
 class TickShot(ModelObject, CollidesWithPlayer):
+    """Bullet from a TickShip."""
 
     def __init__(self, **kwargs):
         super(TickShot, self).__init__(**kwargs)
@@ -156,20 +162,16 @@ class TickShot(ModelObject, CollidesWithPlayer):
             self.kill()
 
 
-class TickShip(ModelObject, EnemyShip, CollidesWithPlayer,
-               CollidesWithPlayerShot):
+class TickShip(ModelObject, EnemyShip):
+    """Small enemy ship."""
 
     def __init__(self, **kwargs):
         super(TickShip, self).__init__(**kwargs)
-        self._init_shoot(1 * 60)
+        self.ticks_to_fire = self.fps
 
     def update(self):
         super(TickShip, self).update()
         self._shoot()
-
-    def _init_shoot(self, period):
-        self.shot_period = period
-        self.ticks_to_fire = period
 
     def _shoot(self):
         self.ticks_to_fire -= 1
@@ -180,10 +182,53 @@ class TickShip(ModelObject, EnemyShip, CollidesWithPlayer,
                 self.maprect.center,
                 vector.scalar_multiply(direction,
                                        self.maprect.width / 2))
-            #self.level.add(EnemyShot(velocity), location)
             self.level.add(TickShot(velocity=list(velocity)),
                            location)
-            self.ticks_to_fire = self.shot_period
+            self.ticks_to_fire = self.fps
+
+
+class TickFactory(ModelObject, EnemyShip):
+    """Big ship that spawns ticks."""
+    color = (255, 128, 0)
+
+    def __init__(self, **kwargs):
+        super(TickFactory, self).__init__(**kwargs)
+        self.hits = 0
+        self.ticks_to_spawn = self.fps * 2.1
+
+    def update(self):
+        super(TickFactory, self).update()
+        self.ticks_to_spawn -= 1
+        if self.ticks_to_spawn <= 0:
+            direction = vector.from_angle(self.angle + 180)
+            velocity = vector.scalar_multiply(direction, 3)
+            location = vector.add(
+                self.maprect.center,
+                vector.scalar_multiply(direction,
+                                       self.maprect.width / 2))
+            self.level.add(TickShip(velocity=list(velocity)),
+                           location)
+            self.ticks_to_spawn = self.fps * 2.1
+
+    def hit(self):
+        """Take additional damage.
+
+        Add explosions and change the sprite to show damage, but don't
+        destroy until hit several times.
+
+        """
+        self.hits += 1
+        # Create an explosion slightly off-center.
+        offset = vector.subtract(vector.randint(10, 10), (5, 5))
+        center = vector.add(self.maprect.center, offset)
+        self.level.add(Explosion(), center)
+        if self.hits == 3:
+            # Change sprite to show damage.
+            self.animation_view = self.__model__['damaged'].get_view()
+            self._set_image(self.animation_view.frame)
+        elif self.hits >= 5:
+            # Destroy.
+            self.destroy()
 
 
 class Asteroid(ModelObject, CollidesWithPlayer, CollidesWithPlayerShot):
@@ -204,8 +249,7 @@ class OreAsteroid(Asteroid):
 
 
 class BigAsteroid(Asteroid):
-    """Rotating destructible rock that spawns smaller rocks when
-    destroyed."""
+    """A big rock that breaks into smaller ones."""
     color = (128, 128, 128)
 
     def destroy(self):

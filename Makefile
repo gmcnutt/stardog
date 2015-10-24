@@ -9,4 +9,5 @@ test:
 	python vector.py
 
 clean:
-	rm -f *~ *.pyc
+	find . -name '*~' -exec rm -f {} \;
+	find . -name '*.py[co]' -exec rm -f {} \;

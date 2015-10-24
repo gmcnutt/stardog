@@ -122,6 +122,10 @@ def add_asteroids(level, num):
                                      angular_velocity=random.random() * 5),
                   position)
 
+def add_tick_factories(level, num):
+    for i in range(num):
+        position = level.get_offscreen_position((50, 50))
+        level.add(sprite.TickFactory(angular_velocity=1), position)
 
 def run(screen, args, gui):
     level = Level(screen=screen,
@@ -138,7 +142,8 @@ def run(screen, args, gui):
                           (level.rect.center[0] + 5000,
                            level.rect.center[1] + 5000))
 
-    add_ticks(level, 10)
+    add_tick_factories(level, 10)
+    #add_ticks(level, 10)
     add_asteroids(level, 100)
 
     large_font = font.AfterFont(os.path.join(ROOTDIR, 'large_font.json'),
@@ -256,6 +261,7 @@ if __name__ == '__main__':
                  (sprite.Stardock, 'sinistar_base'),
                  (sprite.OreAsteroid, 'ore_asteroid'),
                  (sprite.Ore, 'ore'),
+                 (sprite.TickFactory, 'tick_factory'),
                  ]
     for pair in model_map:
         pair[0].__model__ = model.load(os.path.join(MODELDIR, pair[1]), FPS)
